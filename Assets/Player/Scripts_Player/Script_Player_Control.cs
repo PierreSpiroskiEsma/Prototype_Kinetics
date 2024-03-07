@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class Player_controle : MonoBehaviour
@@ -20,10 +21,8 @@ public class Player_controle : MonoBehaviour
 
     [SerializeField] SciptsObject_PlayerStats Stats;
 
-    [SerializeField]  bool Bool_Dash_Available = true;
+    [SerializeField] bool Bool_Dash_Available = true;
     [SerializeField] bool isGrounded;
-
-
 
     // ***************************************************************************************** \\
     // START
@@ -268,44 +267,118 @@ public class Player_controle : MonoBehaviour
     // essence
     // ***************************************************************************************** \\
 
-    char[] Essence_Inventory = new char [3];
+    [SerializeField] int[] Essence_Inventory = new int [3];
 
     bool Essence_Use(int Action_Type) {
-        for (int i = 0; i < Essence_Inventory.Length; i++)
-        {
-            if (Essence_Inventory[Essence_Inventory.Length - (i+1)] != 'X')
-            {
+        for (int i = 0; i < Essence_Inventory.Length; i++) {
+
+            if (Essence_Inventory[Essence_Inventory.Length - (i+1)] != 0) {
+
                 switch (Action_Type) { // peut y avoirs une fonction ici
+
                     //Attack
                     case 1:
+
+                        switch (Essence_Inventory[Essence_Inventory.Length - (i + 1)]) {
+                             
+                            case 1 :
+                                Debug.Log("Strong Attack");
+                            break;
+
+                            case 2 :
+                                Debug.Log("Speed Attack");
+                            break;
+
+                            case 3 :
+                                Debug.Log("Ranged Attack");
+                            break;
+
+                            default: return false;
+                        }
 
                     break; 
 
                     //Block
                     case 2:
 
-                    break;
+                        Debug.Log("Block"); // cancel la magie et ne la suprime pas de la reserve
+
+                    return true;
 
                     //Sprint
                     case 3:
+
+                        switch (Essence_Inventory[Essence_Inventory.Length - (i + 1)]) {
+
+                            case 1:
+                                Debug.Log("Charge");
+                            break;
+
+                            case 2:
+                                Debug.Log("Super Speed");
+                            break;
+
+                            case 3:
+                                Debug.Log("Teleport");
+                            break;
+
+                            default: return false;
+                        }
 
                     break;
                     
                     //Jump
                     case 4:
-                        
+
+                        switch (Essence_Inventory[Essence_Inventory.Length - (i + 1)]) {
+
+                            case 1:
+                                Debug.Log("Big Jump");
+                            break;
+
+                            case 2:
+                                Debug.Log("Wall Jump");
+                            break;
+
+                            case 3:
+                                Debug.Log("Teleport");
+                            break;
+
+                            default: return false;
+                        }
+
                     break;
                     
                     //Taunt
                     default:
-                    
+
+                        switch (Essence_Inventory[Essence_Inventory.Length - (i + 1)]) {
+
+                            case 1:
+                                Debug.Log("Power Taunt");
+                            break;
+
+                            case 2:
+                                Debug.Log("Speed Taunt");
+                            break;
+
+                            case 3:
+                                Debug.Log("Range Taunt");
+                            break;
+
+                            default: return false;
+                        }
+
                     break;
                 }
 
-                Essence_Inventory[Essence_Inventory.Length - (i + 1)] = 'X';
+                Essence_Inventory[Essence_Inventory.Length - (i + 1)] = 0;
+                Debug.Log("Essence " + Essence_Inventory[Essence_Inventory.Length - (i + 1)] + " Has Been used");
                 return true;
             }
         }
+
+        Debug.Log("No Essence Avaiable");
         return false;
     }
 
@@ -339,8 +412,14 @@ public class Player_controle : MonoBehaviour
 
             go_attack();
             Animate_Attaque_On();
+            Essence_Use(1);
 
-        } 
+        }
+
+        if (Input.GetKeyDown(KeyCode.Keypad2)) {
+
+            Essence_Use(2);
+        }
 
         ////slide
         //if (Input.GetKey(KeyCode.Keypad2)) {
