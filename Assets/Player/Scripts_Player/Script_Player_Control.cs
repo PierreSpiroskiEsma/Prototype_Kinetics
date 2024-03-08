@@ -24,6 +24,8 @@ public class Player_controle : MonoBehaviour
     [SerializeField] bool Bool_Dash_Available = true;
     [SerializeField] bool isGrounded;
 
+    [SerializeField] int[] Essence_Inventory = new int[3];
+
     // ***************************************************************************************** \\
     // START
     // ***************************************************************************************** \\
@@ -267,19 +269,53 @@ public class Player_controle : MonoBehaviour
     // essence
     // ***************************************************************************************** \\
 
-    [SerializeField] int[] Essence_Inventory = new int [3];
+
+
+    // GET
+
+    public bool Essence_Get (int New_Essence, int Action_Type) {
+
+        if (Action_Type ==  1 || Action_Type == 2) {
+
+            if (Essence_Inventory[Essence_Inventory.Length - 1] != 0) {
+
+                Debug.Log("Essence Pool is full, Damage taken");
+                return false;
+
+            }
+        }
+
+        for (int i = 0; i < Essence_Inventory.Length; i++) {
+
+            if (Essence_Inventory[i] == 0) {
+
+                Essence_Inventory[i] = New_Essence;
+                Debug.Log("Essence " + New_Essence + " Has been added to the slots " + (i));
+                return true;
+
+            } 
+        }
+
+        Debug.Log("Essence Pool is full, No Essense has been add");
+        return false;
+    }
+
+
+    // USE
+    
 
     bool Essence_Use(int Action_Type) {
         for (int i = 0; i < Essence_Inventory.Length; i++) {
+            int Essence_Type = Essence_Inventory[Essence_Inventory.Length - (i + 1)];
 
-            if (Essence_Inventory[Essence_Inventory.Length - (i+1)] != 0) {
+            if (Essence_Type != 0) {
 
                 switch (Action_Type) { // peut y avoirs une fonction ici
 
                     //Attack
                     case 1:
 
-                        switch (Essence_Inventory[Essence_Inventory.Length - (i + 1)]) {
+                        switch (Essence_Type) {
                              
                             case 1 :
                                 Debug.Log("Strong Attack");
@@ -308,7 +344,7 @@ public class Player_controle : MonoBehaviour
                     //Sprint
                     case 3:
 
-                        switch (Essence_Inventory[Essence_Inventory.Length - (i + 1)]) {
+                        switch (Essence_Type) {
 
                             case 1:
                                 Debug.Log("Charge");
@@ -330,7 +366,7 @@ public class Player_controle : MonoBehaviour
                     //Jump
                     case 4:
 
-                        switch (Essence_Inventory[Essence_Inventory.Length - (i + 1)]) {
+                        switch (Essence_Type) {
 
                             case 1:
                                 Debug.Log("Big Jump");
@@ -352,7 +388,7 @@ public class Player_controle : MonoBehaviour
                     //Taunt
                     default:
 
-                        switch (Essence_Inventory[Essence_Inventory.Length - (i + 1)]) {
+                        switch (Essence_Type) {
 
                             case 1:
                                 Debug.Log("Power Taunt");
