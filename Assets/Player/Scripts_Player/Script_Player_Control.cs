@@ -280,7 +280,8 @@ public class Player_controle : MonoBehaviour
         for (int i = 0; i < Essence_Inventory.Length; i++) {
 
             if (Essence_Inventory[i] != 0) {
-                
+
+                ParticleBox.Essence_Color_Switch(Essence_Inventory[i]);
                 set = true;
             }
         }
