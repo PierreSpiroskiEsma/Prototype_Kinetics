@@ -20,6 +20,7 @@ public class Player_controle : MonoBehaviour
     [SerializeField] bool Freeze = false;
 
     [SerializeField] SciptsObject_PlayerStats Stats;
+    [SerializeField] Script_Essence_Praticle_Rotation ParticleBox;
 
     [SerializeField] bool Bool_Dash_Available = true;
     [SerializeField] bool isGrounded;
@@ -271,6 +272,23 @@ public class Player_controle : MonoBehaviour
 
 
 
+    private bool Essence_Lit() {
+
+        bool set = false;
+
+        for (int i = 0; i < Essence_Inventory.Length; i++) {
+
+            if (Essence_Inventory[i] != 0) {
+                set = true;
+            }
+        }
+        
+        transform.GetChild(5).gameObject.SetActive(set);
+
+        return true;
+    }
+
+
     // GET
 
     public bool Essence_Get (int New_Essence, int Action_Type) {
@@ -291,6 +309,7 @@ public class Player_controle : MonoBehaviour
 
                 Essence_Inventory[i] = New_Essence;
                 Debug.Log("Essence " + New_Essence + " Has been added to the slots " + (i));
+                Essence_Lit();
                 return true;
 
             } 
@@ -410,11 +429,13 @@ public class Player_controle : MonoBehaviour
 
                 Essence_Inventory[Essence_Inventory.Length - (i + 1)] = 0;
                 Debug.Log("Essence " + Essence_Inventory[Essence_Inventory.Length - (i + 1)] + " Has Been used");
+                Essence_Lit();
                 return true;
             }
         }
 
         Debug.Log("No Essence Avaiable");
+        Essence_Lit();
         return false;
     }
 
