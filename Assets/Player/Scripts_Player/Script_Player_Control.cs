@@ -16,6 +16,10 @@ public class Player_controle : MonoBehaviour
     [SerializeField] Transform groundCheck;
     [SerializeField] LayerMask CollisionsLayers;
 
+    [SerializeField] Transform WallJump_Hitbox_Location;
+    [SerializeField] LayerMask WallJump_ColisionLayer;
+    [SerializeField] Vector2 WallJump_Hitbox_Size;
+
 
     [SerializeField] bool Freeze = false;
 
@@ -24,6 +28,7 @@ public class Player_controle : MonoBehaviour
 
     [SerializeField] bool Bool_Dash_Available = true;
     [SerializeField] bool isGrounded;
+    [SerializeField] bool isWall;
 
     [SerializeField] int[] Essence_Inventory = new int[3];
 
@@ -62,6 +67,7 @@ public class Player_controle : MonoBehaviour
         //groundCheck.position = new Vector2(this.transform.position.x + this.GetComponent<BoxCollider2D>().offset.x, groundCheck.position.y);
 
         isGrounded = Physics2D.OverlapCircle(groundCheck.position, groundCheckRadius, CollisionsLayers);
+        isWall = Physics2D.OverlapBox(WallJump_Hitbox_Location.position, WallJump_Hitbox_Size, WallJump_ColisionLayer);
 
         if (isGrounded) {
             animate_jump(false);
@@ -76,6 +82,7 @@ public class Player_controle : MonoBehaviour
         // rendu et position du cercle sous le joueur 
         Gizmos.color = Color.blue;
         Gizmos.DrawWireSphere(groundCheck.position, groundCheckRadius);
+        Gizmos.DrawWireCube(WallJump_Hitbox_Location.position, WallJump_Hitbox_Size);
     }
 
     // ***************************************************************************************** \\
@@ -102,23 +109,6 @@ public class Player_controle : MonoBehaviour
             animate_jump(false);
         }
     }
-
-    //void OnCollisionEnter2D(Collision2D other)
-    //{
-    //    if (other.gameObject.CompareTag("World") || other.gameObject.CompareTag("MovingObject"))
-    //    {
-    //        isGrounded = true;
-    //        animate_jump(false);
-    //    }
-    //}
-    //void OnCollisionExit2D(Collision2D other)
-    //{
-    //    if (other.gameObject.CompareTag("World") || other.gameObject.CompareTag("MovingObject"))
-    //    {
-    //        isGrounded = false;
-    //        animate_jump(true);
-    //    }
-    //}
 
     // ***************************************************************************************** \\
     // fonction d'action 
@@ -155,31 +145,6 @@ public class Player_controle : MonoBehaviour
     void Speed_Reset() {
         Stats.Set_Player_Speed(Stats.Get_PlayerStatistics_Speed());
     }
-
-    //void go_slide(bool set)
-    //{
-
-    //    if (set)
-    //    {
-    //        if (Input.GetKey(KeyCode.LeftArrow))
-    //        {
-
-    //            this.GetComponent<BoxCollider2D>().offset = new Vector2(0.08f, -0.19f);
-    //        }
-    //        else
-    //        {
-
-    //            this.GetComponent<BoxCollider2D>().offset = new Vector2(-0.08f, -0.19f);
-    //        }
-
-    //        this.GetComponent<BoxCollider2D>().size = new Vector2(0.45f, 0.3f);
-    //    }
-    //    else
-    //    {
-    //        this.GetComponent<BoxCollider2D>().size = new Vector2(0.30f, 0.52f);
-    //    }
-
-    //}
 
     void go_dash() {
 
@@ -286,7 +251,7 @@ public class Player_controle : MonoBehaviour
             }
         }
         
-        transform.GetChild(5).gameObject.SetActive(set);
+        transform.GetChild(0).gameObject.SetActive(set);
 
         return true;
     }
@@ -480,18 +445,6 @@ public class Player_controle : MonoBehaviour
 
             Essence_Use(2);
         }
-
-        ////slide
-        //if (Input.GetKey(KeyCode.Keypad2)) {
-
-        //    go_slide(true);
-        //    animate_slide(true);
-        //}
-        //else if (Input.GetKeyUp(KeyCode.Keypad2)) {
-
-        //    go_slide(false);
-        //    animate_slide(false);
-        //};
 
         //dash
         if (Input.GetKeyDown(KeyCode.Keypad3) && Bool_Dash_Available) {
