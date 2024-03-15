@@ -3,14 +3,15 @@ using System.Collections;
 using System.Collections.Generic;
 using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 public class Player_controle : MonoBehaviour
 
 //definition des champ de regalge de la vitesse
 {
-    [SerializeField] Animator Animator_player;
-    [SerializeField] SpriteRenderer sprite_renderer;
-    [SerializeField] Rigidbody2D rigidbody;
+    private Animator _Animator;
+    private SpriteRenderer _SpriteRenderer;
+    private Rigidbody2D _rigidbody;
 
     [SerializeField] float groundCheckRadius;
     [SerializeField] Transform groundCheck;
@@ -31,6 +32,66 @@ public class Player_controle : MonoBehaviour
     [SerializeField] bool isWall;
 
     [SerializeField] int[] Essence_Inventory = new int[3];
+    private bool Essence_IsActive;
+
+     private Player_Input_Manager _inputManager;
+     private InputAction _moveAction, _attackAction, _blockAction, _dashAction, _essenceAction, _interactAction, _jumpAction;
+
+    // ***************************************************************************************** \\
+    // Creation Setup
+    // ***************************************************************************************** \\
+
+    private void Awake() {
+
+        _Animator = this.GetComponent<Animator>();
+        _SpriteRenderer = this.GetComponent<SpriteRenderer>();
+        _rigidbody = this.GetComponent<Rigidbody2D>();
+
+        _inputManager = new Player_Input_Manager();
+
+        _moveAction = _inputManager.Player.Move;
+        _attackAction = _inputManager.Player.Attack;
+        _blockAction = _inputManager.Player.Block;
+        _dashAction = _inputManager.Player.Dash;
+        _essenceAction = _inputManager.Player.Essence;
+        _interactAction = _inputManager.Player.Interact;
+        _jumpAction = _inputManager.Player.Jump;
+
+    }
+
+    private void OnEnable() {
+
+        Essence_IsActive = false;
+
+        _moveAction.Enable();
+        _attackAction.Enable();
+        _blockAction.Enable();
+        _dashAction.Enable();
+        _essenceAction.Enable();
+        _interactAction.Enable();
+        _jumpAction.Enable();
+
+        _jumpAction.performed += OnJump;
+        _attackAction.performed += OnAttack;
+        _essenceAction.performed += OnEssence;
+        _blockAction.performed += OnBlock;
+    }
+
+    private void OnDisable() {
+
+        _moveAction.Disable();
+        _attackAction.Disable();
+        _blockAction.Disable();
+        _dashAction.Disable();
+        _essenceAction.Disable();
+        _interactAction.Disable();
+        _jumpAction.Disable();
+
+        _jumpAction.performed -= OnJump;
+        _attackAction.performed -= OnAttack;
+        _essenceAction.performed -= OnEssence;
+        _blockAction.performed -= OnBlock;
+    }
 
     // ***************************************************************************************** \\
     // START
@@ -74,8 +135,14 @@ public class Player_controle : MonoBehaviour
         } else {
             animate_jump(true);
         }
+
+        Vector2 Mouve_Direction = _moveAction.ReadValue<Vector2>();
+        Debug.Log($"mouve: {Mouve_Direction}");
     }
 
+    // ***************************************************************************************** \\
+    // Development Tool
+    // ***************************************************************************************** \\
 
     private void OnDrawGizmos()
     {
@@ -113,6 +180,48 @@ public class Player_controle : MonoBehaviour
     // ***************************************************************************************** \\
     // fonction d'action 
     // ***************************************************************************************** \\
+
+   private void OnJump(InputAction.CallbackContext context) {
+
+        Debug.Log("Jump");
+
+   }
+
+    private void OnAttack(InputAction.CallbackContext context) {
+
+        Animate_Attaque_On();
+
+        if (Essence_IsActive) {
+
+            Essence_Use(1);
+
+        } else {
+
+            go_attack();
+
+        }
+
+    }
+
+    private void OnEssence(InputAction.CallbackContext context) {
+
+        Essence_IsActive = true;
+    }
+
+    private void OnBlock(InputAction.CallbackContext context) {
+
+        if (Essence_IsActive) {
+
+            Essence_IsActive = false;
+            Debug.Log("Essence Use is cancel + Block");
+
+        } else {
+
+            Debug.Log("Block");
+        }
+
+    }
+
     void go_left() {
 
         //Transform
@@ -131,7 +240,7 @@ public class Player_controle : MonoBehaviour
     }
 
     void go_attack() {
- 
+        Debug.Log("Basic Action Is Performed");
     }
 
     void Dash_Accelerate() {
@@ -160,7 +269,7 @@ public class Player_controle : MonoBehaviour
             Debug.Log("try jumping");
             Debug.Log(Stats.Get_PlayerStatistics_Jump_Speed());
             Debug.Log(Stats.Get_PlayerStatistics_Jump_Speed() * Time.deltaTime);
-            rigidbody.velocity = new Vector2(rigidbody.velocity.x, (Stats.Get_PlayerStatistics_Jump_Speed() * Time.deltaTime));
+            _rigidbody.velocity = new Vector2(_rigidbody.velocity.x, (Stats.Get_PlayerStatistics_Jump_Speed() * Time.deltaTime));
 
         }
 
@@ -173,35 +282,35 @@ public class Player_controle : MonoBehaviour
     void animate_left() {
 
         //animation
-        Animator_player.SetBool("B_Anim_Run", true);
-        sprite_renderer.flipX = true;
+        _Animator.SetBool("B_Anim_Run", true);
+        _SpriteRenderer.flipX = true;
 
     }
     void animate_right() {
 
         //animation
-        Animator_player.SetBool("B_Anim_Run", true);
-        sprite_renderer.flipX = false;
+        _Animator.SetBool("B_Anim_Run", true);
+        _SpriteRenderer.flipX = false;
 
     }
 
     void animate_run_stop() {
 
-        Animator_player.SetBool("B_Anim_Run", false);
+        _Animator.SetBool("B_Anim_Run", false);
 
     }
 
     void Animate_Attaque_On() {
 
         //animation
-        Animator_player.SetBool("B_Anim_Attack", true);
+        _Animator.SetBool("B_Anim_Attack", true);
 
     }
 
     void Animate_Attaque_Off() {
 
         //animation
-        Animator_player.SetBool("B_Anim_Attack", false);
+        _Animator.SetBool("B_Anim_Attack", false);
 
     }
 
@@ -211,18 +320,18 @@ public class Player_controle : MonoBehaviour
     //}
 
     void Animate_Dash_On() {
-        Animator_player.SetBool("B_Anim_Dash", true);
+        _Animator.SetBool("B_Anim_Dash", true);
     }
 
     void Animate_Dash_Off() {
 
-        Animator_player.SetBool("B_Anim_Dash", false);
+        _Animator.SetBool("B_Anim_Dash", false);
     }
 
     void animate_jump(bool set) {
 
         //animation
-        Animator_player.SetBool("B_Anim_Jump", set);
+        _Animator.SetBool("B_Anim_Jump", set);
 
     }
 
@@ -433,13 +542,13 @@ public class Player_controle : MonoBehaviour
         }
 
         //attaque
-        if (Input.GetKey(KeyCode.Keypad1)) {
+        //if (Input.GetKey(KeyCode.Keypad1)) {
 
-            go_attack();
-            Animate_Attaque_On();
-            Essence_Use(1);
+        //    go_attack();
+        //    Animate_Attaque_On();
+        //    Essence_Use(1);
 
-        }
+        //}
 
         if (Input.GetKeyDown(KeyCode.Keypad2)) {
 
