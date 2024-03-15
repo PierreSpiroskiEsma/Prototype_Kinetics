@@ -12,6 +12,10 @@ public class script_EssenceDispencer_Power : MonoBehaviour
     [SerializeField] private Light2D obj_light;
     [SerializeField] private int Essence_Type;
 
+    private void Awake() {
+        obj_light = this.GetComponentInChildren<Light2D>();
+    }
+
     private void Start() {
 
         Pylone_type_selector(Essence_Type);
