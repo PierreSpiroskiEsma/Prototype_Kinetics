@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
 
 public class Player_controle : MonoBehaviour
@@ -12,6 +13,7 @@ public class Player_controle : MonoBehaviour
     private Animator _Animator;
     private SpriteRenderer _SpriteRenderer;
     private Rigidbody2D _rigidbody;
+    private Vector2 Mouve_Direction;
 
     [SerializeField] float groundCheckRadius;
     [SerializeField] Transform groundCheck;
@@ -75,6 +77,7 @@ public class Player_controle : MonoBehaviour
         _attackAction.performed += OnAttack;
         _essenceAction.performed += OnEssence;
         _blockAction.performed += OnBlock;
+        _moveAction.performed += OnMouve;
     }
 
     private void OnDisable() {
@@ -91,6 +94,7 @@ public class Player_controle : MonoBehaviour
         _attackAction.performed -= OnAttack;
         _essenceAction.performed -= OnEssence;
         _blockAction.performed -= OnBlock;
+        _moveAction.performed -= OnMouve;
     }
 
     // ***************************************************************************************** \\
@@ -136,8 +140,12 @@ public class Player_controle : MonoBehaviour
             animate_jump(true);
         }
 
-        Vector2 Mouve_Direction = _moveAction.ReadValue<Vector2>();
-        Debug.Log($"mouve: {Mouve_Direction}");
+        Mouve_Direction = _moveAction.ReadValue<Vector2>();
+        Vector2 Player_Velocity = _rigidbody.velocity;
+        Player_Velocity.x = Stats.Get_Player_Speed() * Mouve_Direction.x;
+        _rigidbody.velocity = Player_Velocity;
+
+        //Debug.Log($"mouve: {Player_Velocity}");
     }
 
     // ***************************************************************************************** \\
@@ -222,20 +230,27 @@ public class Player_controle : MonoBehaviour
 
     }
 
-    void go_left() {
+    void OnMouve(InputAction.CallbackContext context) {
 
-        //Transform
-        transform.Translate(-Stats.Get_Player_Speed(), 0, 0, Space.World);
-        //BoxCollider2D
-        this.GetComponent<BoxCollider2D>().offset = new Vector2(0.08f, -0.07f);
+        //transform.Translate(-Stats.Get_Player_Speed(), 0, 0, Space.World);
+
+        //_rigidbody.velocity = new Vector2(Mouve_Direction.x * Stats.Get_Player_Speed(), 0f);
+
+        if (Mouve_Direction.x < 0) {
+            this.GetComponent<BoxCollider2D>().offset = new Vector2(0.08f, -0.07f);
+        } else {
+            this.GetComponent<BoxCollider2D>().offset = new Vector2(-0.08f, -0.07f);
+        }
+
     }
+        
 
     void go_right() {
 
         //Transform
-        transform.Translate(Stats.Get_Player_Speed(), 0, 0, Space.World);
+        //transform.Translate(Stats.Get_Player_Speed(), 0, 0, Space.World);
         //BoxCollider2D
-        this.GetComponent<BoxCollider2D>().offset = new Vector2(-0.08f, -0.07f);
+       
         
     }
 
@@ -523,7 +538,7 @@ public class Player_controle : MonoBehaviour
 
         //run
         if (Input.GetKey(KeyCode.LeftArrow)) {
-            go_left();
+            
             animate_left();
         }
         else if (Input.GetKey(KeyCode.RightArrow)) {
