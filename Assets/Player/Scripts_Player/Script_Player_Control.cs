@@ -187,33 +187,19 @@ public class Player_controle : MonoBehaviour {
 
     public void FreezOff() { Freeze = false; }
 
-    // ***************************************************************************************** \\
-    // Ground détection
-    // ***************************************************************************************** \\
-
-
-    public void IsFalling(bool set)
-    {
-        if (set)
-        {
-            animate_jump(true);
-        }
-        else
-        {
-            animate_jump(false);
-        }
-    }
 
     // ***************************************************************************************** \\
-    // fonction d'action 
+    // fonction d'input 
     // ***************************************************************************************** \\
 
+    // --- JUMP --- \\
    private void OnJump(InputAction.CallbackContext context) {
 
         Debug.Log("Jump");
 
    }
 
+    // --- ATTACK --- \\
     private void OnAttack(InputAction.CallbackContext context) {
 
         Animate_Attaque_On();
@@ -230,11 +216,13 @@ public class Player_controle : MonoBehaviour {
 
     }
 
+    // --- ESSENCE --- \\
     private void OnEssence(InputAction.CallbackContext context) {
 
         Essence_IsActive = true;
     }
 
+    // --- BLOCK --- \\
     private void OnBlock(InputAction.CallbackContext context) {
 
         if (Essence_IsActive) {
@@ -249,12 +237,16 @@ public class Player_controle : MonoBehaviour {
 
     }
 
+    // --- MOUVE --- \\
     void OnMouve(InputAction.CallbackContext context) {
 
         animate_run();
 
     }
 
+    // ***************************************************************************************** \\
+    // Action
+    // ***************************************************************************************** \\
 
 
     void Attack_Normal() {
@@ -263,7 +255,13 @@ public class Player_controle : MonoBehaviour {
 
         foreach (var Enemy in Player_Hitbox) {
 
-            Debug.Log(Enemy.name);
+            if (Enemy.tag == "Enemy") {
+
+                Enemy.GetComponent<Script_BadBoi>().Damage_Taken('n', 1);
+
+                Debug.Log(Enemy.name);
+
+            }
         }
 
 
@@ -305,7 +303,7 @@ public class Player_controle : MonoBehaviour {
     }
 
     // ***************************************************************************************** \\
-    // fonction d'animation 
+    // animation 
     // ***************************************************************************************** \\
 
     void animate_run() {
@@ -338,22 +336,15 @@ public class Player_controle : MonoBehaviour {
 
     void Animate_Attaque_On() {
 
-        //animation
         _Animator.SetBool("B_Anim_Attack", true);
 
     }
 
     void Animate_Attaque_Off() {
 
-        //animation
         _Animator.SetBool("B_Anim_Attack", false);
 
     }
-
-    //void animate_slide(bool set) {
-    //    //animation
-    //    Animator_player.SetBool("Bool_Slide", set);
-    //}
 
     void Animate_Dash_On() {
         _Animator.SetBool("B_Anim_Dash", true);
@@ -371,10 +362,13 @@ public class Player_controle : MonoBehaviour {
 
     }
 
-    // ***************************************************************************************** \\
-    // Action d'animation 
-    // ***************************************************************************************** \\
-
+    public void IsFalling(bool set) {
+        if (set) {
+            animate_jump(true);
+        } else {
+            animate_jump(false);
+        }
+    }
 
 
     // ***************************************************************************************** \\
@@ -382,7 +376,7 @@ public class Player_controle : MonoBehaviour {
     // ***************************************************************************************** \\
 
 
-
+    // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! A DEPLACER DANS LES PILONE !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! \\
     private bool Essence_Lit() {
 
         bool set = false;
@@ -395,197 +389,198 @@ public class Player_controle : MonoBehaviour {
                 set = true;
             }
         }
-        
+
         transform.GetChild(0).gameObject.SetActive(set);
 
         return true;
     }
+    // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! \\
 
 
     // GET
 
     public bool Essence_Get (int New_Essence, int Action_Type) {
 
-        if (Action_Type ==  1 || Action_Type == 2) {
+    if (Action_Type ==  1 || Action_Type == 2) {
 
-            if (Essence_Inventory[Essence_Inventory.Length - 1] != 0) {
+        if (Essence_Inventory[Essence_Inventory.Length - 1] != 0) {
 
-                Debug.Log("Essence Pool is full, Damage taken");
-                return false;
+            Debug.Log("Essence Pool is full, Damage taken");
+            return false;
 
-            }
         }
+    }
 
-        for (int i = 0; i < Essence_Inventory.Length; i++) {
+    for (int i = 0; i < Essence_Inventory.Length; i++) {
 
-            if (Essence_Inventory[i] == 0) {
+        if (Essence_Inventory[i] == 0) {
 
-                Essence_Inventory[i] = New_Essence;
-                Debug.Log("Essence " + New_Essence + " Has been added to the slots " + (i));
-                Essence_Lit();
+            Essence_Inventory[i] = New_Essence;
+            Debug.Log("Essence " + New_Essence + " Has been added to the slots " + (i));
+            Essence_Lit();
+            return true;
+
+        } 
+    }
+
+    Debug.Log("Essence Pool is full, No Essense has been add");
+    return false;
+}
+
+
+// USE
+
+
+bool Essence_Use(int Action_Type) {
+    for (int i = 0; i < Essence_Inventory.Length; i++) {
+        int Essence_Type = Essence_Inventory[Essence_Inventory.Length - (i + 1)];
+
+        if (Essence_Type != 0) {
+
+            switch (Action_Type) { // peut y avoirs une fonction ici
+
+                //Attack
+                case 1:
+
+                    switch (Essence_Type) {
+
+                        case 1 :
+                            Debug.Log("Strong Attack");
+                        break;
+
+                        case 2 :
+                            Debug.Log("Speed Attack");
+                        break;
+
+                        case 3 :
+                            Debug.Log("Ranged Attack");
+                        break;
+
+                        default: return false;
+                    }
+
+                break; 
+
+                //Block
+                case 2:
+
+                    Debug.Log("Block"); // cancel la magie et ne la suprime pas de la reserve
+
                 return true;
 
-            } 
-        }
+                //Sprint
+                case 3:
 
-        Debug.Log("Essence Pool is full, No Essense has been add");
-        return false;
-    }
+                    switch (Essence_Type) {
 
+                        case 1:
+                            Debug.Log("Charge");
+                        break;
 
-    // USE
-    
+                        case 2:
+                            Debug.Log("Super Speed");
+                        break;
 
-    bool Essence_Use(int Action_Type) {
-        for (int i = 0; i < Essence_Inventory.Length; i++) {
-            int Essence_Type = Essence_Inventory[Essence_Inventory.Length - (i + 1)];
+                        case 3:
+                            Debug.Log("Teleport");
+                        break;
 
-            if (Essence_Type != 0) {
+                        default: return false;
+                    }
 
-                switch (Action_Type) { // peut y avoirs une fonction ici
+                break;
 
-                    //Attack
-                    case 1:
+                //Jump
+                case 4:
 
-                        switch (Essence_Type) {
-                             
-                            case 1 :
-                                Debug.Log("Strong Attack");
-                            break;
+                    switch (Essence_Type) {
 
-                            case 2 :
-                                Debug.Log("Speed Attack");
-                            break;
+                        case 1:
+                            Debug.Log("Big Jump");
+                        break;
 
-                            case 3 :
-                                Debug.Log("Ranged Attack");
-                            break;
+                        case 2:
+                            Debug.Log("Wall Jump");
+                        break;
 
-                            default: return false;
-                        }
+                        case 3:
+                            Debug.Log("Teleport");
+                        break;
 
-                    break; 
+                        default: return false;
+                    }
 
-                    //Block
-                    case 2:
+                break;
 
-                        Debug.Log("Block"); // cancel la magie et ne la suprime pas de la reserve
+                //Taunt
+                default:
 
-                    return true;
+                    switch (Essence_Type) {
 
-                    //Sprint
-                    case 3:
+                        case 1:
+                            Debug.Log("Power Taunt");
+                        break;
 
-                        switch (Essence_Type) {
+                        case 2:
+                            Debug.Log("Speed Taunt");
+                        break;
 
-                            case 1:
-                                Debug.Log("Charge");
-                            break;
+                        case 3:
+                            Debug.Log("Range Taunt");
+                        break;
 
-                            case 2:
-                                Debug.Log("Super Speed");
-                            break;
+                        default: return false;
+                    }
 
-                            case 3:
-                                Debug.Log("Teleport");
-                            break;
-
-                            default: return false;
-                        }
-
-                    break;
-                    
-                    //Jump
-                    case 4:
-
-                        switch (Essence_Type) {
-
-                            case 1:
-                                Debug.Log("Big Jump");
-                            break;
-
-                            case 2:
-                                Debug.Log("Wall Jump");
-                            break;
-
-                            case 3:
-                                Debug.Log("Teleport");
-                            break;
-
-                            default: return false;
-                        }
-
-                    break;
-                    
-                    //Taunt
-                    default:
-
-                        switch (Essence_Type) {
-
-                            case 1:
-                                Debug.Log("Power Taunt");
-                            break;
-
-                            case 2:
-                                Debug.Log("Speed Taunt");
-                            break;
-
-                            case 3:
-                                Debug.Log("Range Taunt");
-                            break;
-
-                            default: return false;
-                        }
-
-                    break;
-                }
-
-                Essence_Inventory[Essence_Inventory.Length - (i + 1)] = 0;
-                Debug.Log("Essence " + Essence_Inventory[Essence_Inventory.Length - (i + 1)] + " Has Been used");
-                Essence_Lit();
-                return true;
+                break;
             }
-        }
 
-        Debug.Log("No Essence Avaiable");
-        Essence_Lit();
-        return false;
+            Essence_Inventory[Essence_Inventory.Length - (i + 1)] = 0;
+            Debug.Log("Essence " + Essence_Inventory[Essence_Inventory.Length - (i + 1)] + " Has Been used");
+            Essence_Lit();
+            return true;
+        }
     }
 
-    // ***************************************************************************************** \\
-    // fonction d'appelle 
-    // ***************************************************************************************** \\
-    void player_mouvement() {
+    Debug.Log("No Essence Avaiable");
+    Essence_Lit();
+    return false;
+}
 
-        //jump
-        if (Input.GetKey(KeyCode.UpArrow)) {
-            go_jump();
-        };
+// ***************************************************************************************** \\
+// OLD fonction d'input 
+// ***************************************************************************************** \\
+void player_mouvement() {
 
-        if (Input.GetKeyDown(KeyCode.Keypad2)) {
+    //jump
+    if (Input.GetKey(KeyCode.UpArrow)) {
+        go_jump();
+    };
 
-            Essence_Use(2);
-        }
+    if (Input.GetKeyDown(KeyCode.Keypad2)) {
 
-        //dash
-        if (Input.GetKeyDown(KeyCode.Keypad3) && Bool_Dash_Available) {
-            go_dash();
-            Animate_Dash_On();
-        }
-
+        Essence_Use(2);
     }
 
-    // ************** Dash ************** \\
-
-    IEnumerator Fonction_Dash()
-    {
-
-        Bool_Dash_Available = false;
-
-        //couldown
-        yield return new WaitForSeconds(Stats.Get_PlayerStatistics_Dash_Couldown());
-
-        Bool_Dash_Available = true;
-
+    //dash
+    if (Input.GetKeyDown(KeyCode.Keypad3) && Bool_Dash_Available) {
+        go_dash();
+        Animate_Dash_On();
     }
+
+}
+
+// ************** Dash ************** \\
+
+IEnumerator Fonction_Dash()
+{
+
+    Bool_Dash_Available = false;
+
+    //couldown
+    yield return new WaitForSeconds(Stats.Get_PlayerStatistics_Dash_Couldown());
+
+    Bool_Dash_Available = true;
+
+}
 }

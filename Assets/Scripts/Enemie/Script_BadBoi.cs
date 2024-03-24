@@ -9,13 +9,13 @@ public class Script_BadBoi : MonoBehaviour {
 
 
     private void Update() {
-
         Is_Dead();
     }
 
+    // Use To inflickt damlage on himself
     public void Damage_Taken (char Damage_Type, int Attack_Strengh) {
 
-        if (Damage_Type != Enemeie_Type) {
+        if (Damage_Type == Enemeie_Type) {
 
             Life_Point = Life_Point - Attack_Strengh;
             Debug.Log("the enemie has taken " + Attack_Strengh + " damage, it now have " + Life_Point + " Life point left.");
@@ -26,6 +26,7 @@ public class Script_BadBoi : MonoBehaviour {
         }
     }
 
+    // check if ther any hp left
     private void Is_Dead() {
 
         if (Life_Point <= 0) {
