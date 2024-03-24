@@ -10,12 +10,12 @@ TagManager:
   - Default
   - TransparentFX
   - Ignore Raycast
-  - 
+  - Player HurtBox
   - Water
   - UI
-  - 
-  - 
-  - 
+  - Enemie HurtBox
+  - Player Hitbox
+  - Enemie Hitbox
   - 
   - 
   - 

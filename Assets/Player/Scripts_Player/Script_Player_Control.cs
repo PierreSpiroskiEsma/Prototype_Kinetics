@@ -36,8 +36,10 @@ public class Player_controle : MonoBehaviour
     [SerializeField] int[] Essence_Inventory = new int[3];
     private bool Essence_IsActive;
 
-     private Player_Input_Manager _inputManager;
-     private InputAction _moveAction, _attackAction, _blockAction, _dashAction, _essenceAction, _interactAction, _jumpAction;
+    private Player_Input_Manager _inputManager;
+    private InputAction _moveAction, _attackAction, _blockAction, _dashAction, _essenceAction, _interactAction, _jumpAction;
+
+    private Transform Action_Transform;
 
     // ***************************************************************************************** \\
     // Creation Setup
@@ -48,6 +50,7 @@ public class Player_controle : MonoBehaviour
         _Animator = this.GetComponent<Animator>();
         _SpriteRenderer = this.GetComponent<SpriteRenderer>();
         _rigidbody = this.GetComponent<Rigidbody2D>();
+        Action_Transform = this.transform.Find("Action"); ;
 
         _inputManager = new Player_Input_Manager();
 
@@ -145,7 +148,7 @@ public class Player_controle : MonoBehaviour
         Player_Velocity.x = Stats.Get_Player_Speed() * Mouve_Direction.x;
         _rigidbody.velocity = Player_Velocity;
 
-        //Debug.Log($"mouve: {Player_Velocity}");
+        animate_StopRun();
     }
 
     // ***************************************************************************************** \\
@@ -232,27 +235,9 @@ public class Player_controle : MonoBehaviour
 
     void OnMouve(InputAction.CallbackContext context) {
 
-        //transform.Translate(-Stats.Get_Player_Speed(), 0, 0, Space.World);
+        animate_run();
 
-        //_rigidbody.velocity = new Vector2(Mouve_Direction.x * Stats.Get_Player_Speed(), 0f);
-
-        if (Mouve_Direction.x < 0) {
-            this.GetComponent<BoxCollider2D>().offset = new Vector2(0.08f, -0.07f);
-        } else {
-            this.GetComponent<BoxCollider2D>().offset = new Vector2(-0.08f, -0.07f);
-        }
-
-    }
-        
-
-    void go_right() {
-
-        //Transform
-        //transform.Translate(Stats.Get_Player_Speed(), 0, 0, Space.World);
-        //BoxCollider2D
-       
-        
-    }
+    }      
 
     void go_attack() {
         Debug.Log("Basic Action Is Performed");
@@ -294,26 +279,34 @@ public class Player_controle : MonoBehaviour
     // ***************************************************************************************** \\
     // fonction d'animation 
     // ***************************************************************************************** \\
-    void animate_left() {
 
-        //animation
-        _Animator.SetBool("B_Anim_Run", true);
-        _SpriteRenderer.flipX = true;
+    void animate_run() {
+
+        if (Mouve_Direction.x < -0.2f) {
+            this.GetComponent<BoxCollider2D>().offset = new Vector2(0.08f, -0.07f);
+            Action_Transform.transform.rotation = Quaternion.Euler(0f, 180f, 0f);
+            _Animator.SetBool("B_Anim_Run", true);
+            _SpriteRenderer.flipX = true;
+
+        } else if (Mouve_Direction.x > 0.2f) {
+            this.GetComponent<BoxCollider2D>().offset = new Vector2(-0.08f, -0.07f);
+            Action_Transform.transform.rotation = Quaternion.Euler(0f, 0f, 0f);
+            _Animator.SetBool("B_Anim_Run", true);
+            _SpriteRenderer.flipX = false;
+        } else {
+            _Animator.SetBool("B_Anim_Run", false);
+        }
 
     }
-    void animate_right() {
 
-        //animation
-        _Animator.SetBool("B_Anim_Run", true);
-        _SpriteRenderer.flipX = false;
+    void animate_StopRun() {
 
-    }
-
-    void animate_run_stop() {
-
-        _Animator.SetBool("B_Anim_Run", false);
+        if (_rigidbody.velocity.x == 0) {
+            _Animator.SetBool("B_Anim_Run", false);
+        }
 
     }
+
 
     void Animate_Attaque_On() {
 
@@ -536,34 +529,10 @@ public class Player_controle : MonoBehaviour
     // ***************************************************************************************** \\
     void player_mouvement() {
 
-        //run
-        if (Input.GetKey(KeyCode.LeftArrow)) {
-            
-            animate_left();
-        }
-        else if (Input.GetKey(KeyCode.RightArrow)) {
-            go_right();
-            animate_right();
-        }
-
         //jump
         if (Input.GetKey(KeyCode.UpArrow)) {
             go_jump();
         };
-
-        //runStop
-        if (Input.GetKeyUp(KeyCode.LeftArrow) || Input.GetKeyUp(KeyCode.RightArrow)) {
-            animate_run_stop();
-        }
-
-        //attaque
-        //if (Input.GetKey(KeyCode.Keypad1)) {
-
-        //    go_attack();
-        //    Animate_Attaque_On();
-        //    Essence_Use(1);
-
-        //}
 
         if (Input.GetKeyDown(KeyCode.Keypad2)) {
 
