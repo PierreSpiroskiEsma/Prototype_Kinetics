@@ -6,39 +6,51 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
 
-public class Player_controle : MonoBehaviour
+public class Player_controle : MonoBehaviour {
 
-//definition des champ de regalge de la vitesse
-{
     private Animator _Animator;
     private SpriteRenderer _SpriteRenderer;
     private Rigidbody2D _rigidbody;
     private Vector2 Mouve_Direction;
 
-    [SerializeField] float groundCheckRadius;
+    //GroundCheck Overlap
     [SerializeField] Transform groundCheck;
+    [SerializeField] float groundCheckRadius;
     [SerializeField] LayerMask CollisionsLayers;
 
+    //WallJump Overlap
     [SerializeField] Transform WallJump_Hitbox_Location;
-    [SerializeField] LayerMask WallJump_ColisionLayer;
     [SerializeField] Vector2 WallJump_Hitbox_Size;
+    [SerializeField] LayerMask WallJump_ColisionLayer;
 
+    //Hitbox Overlap
+    [SerializeField] private Transform Player_Hitbox_position;
+    [SerializeField] private Vector2 Player_Hitbox_RangeSize;
+    [SerializeField] private LayerMask Player_Hitbox_LayerMask;
 
+    //is the player is Freeze in space
     [SerializeField] bool Freeze = false;
 
+    //the Statistic sheets of the player
     [SerializeField] SciptsObject_PlayerStats Stats;
-    [SerializeField] Script_Essence_Praticle_Rotation ParticleBox;
 
+    //State Check
     [SerializeField] bool Bool_Dash_Available = true;
     [SerializeField] bool isGrounded;
     [SerializeField] bool isWall;
 
+    //Essence System
     [SerializeField] int[] Essence_Inventory = new int[3];
     private bool Essence_IsActive;
 
+    //Input Manager
     private Player_Input_Manager _inputManager;
     private InputAction _moveAction, _attackAction, _blockAction, _dashAction, _essenceAction, _interactAction, _jumpAction;
 
+    //Particle Call
+    private Script_Essence_Praticle_Rotation ParticleBox;
+
+    //Trasform Call for Movement transformation (Flip sprite ...)
     private Transform Action_Transform;
 
     // ***************************************************************************************** \\
@@ -50,7 +62,10 @@ public class Player_controle : MonoBehaviour
         _Animator = this.GetComponent<Animator>();
         _SpriteRenderer = this.GetComponent<SpriteRenderer>();
         _rigidbody = this.GetComponent<Rigidbody2D>();
-        Action_Transform = this.transform.Find("Action"); ;
+
+        Action_Transform = this.transform.Find("Action");
+
+        ParticleBox = this.transform.Find("Essence_Particle_Box").GetComponent<Script_Essence_Praticle_Rotation>();
 
         _inputManager = new Player_Input_Manager();
 
@@ -161,6 +176,7 @@ public class Player_controle : MonoBehaviour
         Gizmos.color = Color.blue;
         Gizmos.DrawWireSphere(groundCheck.position, groundCheckRadius);
         Gizmos.DrawWireCube(WallJump_Hitbox_Location.position, WallJump_Hitbox_Size);
+        Gizmos.DrawWireCube(Player_Hitbox_position.position, Player_Hitbox_RangeSize);
     }
 
     // ***************************************************************************************** \\
@@ -208,7 +224,7 @@ public class Player_controle : MonoBehaviour
 
         } else {
 
-            go_attack();
+            Attack_Normal();
 
         }
 
@@ -237,10 +253,22 @@ public class Player_controle : MonoBehaviour
 
         animate_run();
 
-    }      
+    }
 
-    void go_attack() {
+
+
+    void Attack_Normal() {
+
+        Collider2D[] Player_Hitbox = Physics2D.OverlapBoxAll(Player_Hitbox_position.position, Player_Hitbox_RangeSize, Player_Hitbox_LayerMask);
+
+        foreach (var Enemy in Player_Hitbox) {
+
+            Debug.Log(Enemy.name);
+        }
+
+
         Debug.Log("Basic Action Is Performed");
+
     }
 
     void Dash_Accelerate() {
