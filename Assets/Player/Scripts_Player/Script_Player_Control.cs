@@ -19,7 +19,8 @@ public class Player_controle : MonoBehaviour {
     [SerializeField] LayerMask CollisionsLayers;
 
     //WallJump Overlap
-    [SerializeField] Transform WallJump_Hitbox_Location;
+    [SerializeField] Transform WallJump_Right_Hitbox_Location;
+    [SerializeField] Transform WallJump_Left_Hitbox_Location;
     [SerializeField] Vector2 WallJump_Hitbox_Size;
     [SerializeField] LayerMask WallJump_ColisionLayer;
 
@@ -149,8 +150,9 @@ public class Player_controle : MonoBehaviour {
 
         //groundCheck.position = new Vector2(this.transform.position.x + this.GetComponent<BoxCollider2D>().offset.x, groundCheck.position.y);
 
-        isGrounded = Physics2D.OverlapCircle(groundCheck.position, groundCheckRadius, CollisionsLayers);
-        isWall = Physics2D.OverlapBox(WallJump_Hitbox_Location.position, WallJump_Hitbox_Size, WallJump_ColisionLayer);
+        isGrounded = Physics2D.OverlapCircle(groundCheck.position, groundCheckRadius, CollisionsLayers).CompareTag("World");
+
+        //isWall = Physics2D.OverlapBox(WallJump_Right_Hitbox_Location.position, WallJump_Hitbox_Size, WallJump_ColisionLayer).CompareTag("World") || Physics2D.OverlapBox(WallJump_Left_Hitbox_Location.position, WallJump_Hitbox_Size, WallJump_ColisionLayer).CompareTag("World");
 
         if (isGrounded) {
             animate_jump(false);
@@ -175,7 +177,8 @@ public class Player_controle : MonoBehaviour {
         // rendu et position du cercle sous le joueur 
         Gizmos.color = Color.blue;
         Gizmos.DrawWireSphere(groundCheck.position, groundCheckRadius);
-        Gizmos.DrawWireCube(WallJump_Hitbox_Location.position, WallJump_Hitbox_Size);
+        Gizmos.DrawWireCube(WallJump_Right_Hitbox_Location.position, WallJump_Hitbox_Size);
+        Gizmos.DrawWireCube(WallJump_Left_Hitbox_Location.position, WallJump_Hitbox_Size);
         Gizmos.DrawWireCube(Player_Hitbox_position.position, Player_Hitbox_RangeSize);
     }
 
@@ -309,17 +312,27 @@ public class Player_controle : MonoBehaviour {
     void animate_run() {
 
         if (Mouve_Direction.x < -0.2f) {
+
             this.GetComponent<BoxCollider2D>().offset = new Vector2(0.08f, -0.07f);
+
             Action_Transform.transform.rotation = Quaternion.Euler(0f, 180f, 0f);
+
             _Animator.SetBool("B_Anim_Run", true);
+
             _SpriteRenderer.flipX = true;
 
         } else if (Mouve_Direction.x > 0.2f) {
+
             this.GetComponent<BoxCollider2D>().offset = new Vector2(-0.08f, -0.07f);
+
             Action_Transform.transform.rotation = Quaternion.Euler(0f, 0f, 0f);
+
             _Animator.SetBool("B_Anim_Run", true);
+
             _SpriteRenderer.flipX = false;
+
         } else {
+
             _Animator.SetBool("B_Anim_Run", false);
         }
 
