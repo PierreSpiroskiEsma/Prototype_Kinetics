@@ -53,6 +53,7 @@ public class Player_controle : MonoBehaviour {
 
     //Trasform Call for Movement transformation (Flip sprite ...)
     private Transform Action_Transform;
+    private Transform Wall_Transform;
 
     // ***************************************************************************************** \\
     // Creation Setup
@@ -65,6 +66,7 @@ public class Player_controle : MonoBehaviour {
         _rigidbody = this.GetComponent<Rigidbody2D>();
 
         Action_Transform = this.transform.Find("Action");
+        Wall_Transform = this.transform.Find("WallJump");
 
         ParticleBox = this.transform.Find("Essence_Particle_Box").GetComponent<Script_Essence_Praticle_Rotation>();
 
@@ -127,19 +129,6 @@ public class Player_controle : MonoBehaviour {
 
     }
 
-
-    // ***************************************************************************************** \\
-    // UPDATE
-    // ***************************************************************************************** \\
-    void Update() {
-
-        // Détection des entrées utilisateur et application des commandes associer
-        if (!Freeze) {
-            player_mouvement();
-        }
-
-    }
-
     // ***************************************************************************************** \\
     // FIXED UPDATE
     // ***************************************************************************************** \\
@@ -150,7 +139,11 @@ public class Player_controle : MonoBehaviour {
 
         //groundCheck.position = new Vector2(this.transform.position.x + this.GetComponent<BoxCollider2D>().offset.x, groundCheck.position.y);
 
-        isGrounded = Physics2D.OverlapCircle(groundCheck.position, groundCheckRadius, CollisionsLayers).CompareTag("World");
+
+        Ground_Detection();
+        Wall_Detection();
+
+
 
         //isWall = Physics2D.OverlapBox(WallJump_Right_Hitbox_Location.position, WallJump_Hitbox_Size, WallJump_ColisionLayer).CompareTag("World") || Physics2D.OverlapBox(WallJump_Left_Hitbox_Location.position, WallJump_Hitbox_Size, WallJump_ColisionLayer).CompareTag("World");
 
@@ -178,8 +171,73 @@ public class Player_controle : MonoBehaviour {
         Gizmos.color = Color.blue;
         Gizmos.DrawWireSphere(groundCheck.position, groundCheckRadius);
         Gizmos.DrawWireCube(WallJump_Right_Hitbox_Location.position, WallJump_Hitbox_Size);
-        Gizmos.DrawWireCube(WallJump_Left_Hitbox_Location.position, WallJump_Hitbox_Size);
         Gizmos.DrawWireCube(Player_Hitbox_position.position, Player_Hitbox_RangeSize);
+    }
+
+    // ***************************************************************************************** \\
+    // Environement detection
+    // ***************************************************************************************** \\
+
+    // --- GROUND --- \\
+    private void Ground_Detection() {
+
+        Collider2D[] Ground_Detection = Physics2D.OverlapCircleAll(groundCheck.position, groundCheckRadius, CollisionsLayers);
+
+        isGrounded = false;
+
+        foreach (var Object in Ground_Detection) {
+
+            if (Object.tag == "World") {
+
+                isGrounded = true;
+
+                Debug.Log(Object.name);
+
+            }
+        }
+    }
+
+    // --- WALL --- \\
+    private void Wall_Detection() {
+
+
+        Collider2D[] Wall_Detection = Physics2D.OverlapBoxAll(WallJump_Right_Hitbox_Location.position, WallJump_Hitbox_Size, WallJump_ColisionLayer);
+
+        isWall = false;
+
+        foreach (var Object in Wall_Detection) {
+
+            if (Object.tag == "World") {
+
+                isWall = true;
+
+                Debug.Log(Object.name);
+
+            }
+        }
+
+        //bool Is_Something = Physics2D.OverlapBox(WallJump_Left_Hitbox_Location.position, WallJump_Hitbox_Size, WallJump_ColisionLayer);
+        //bool Is_Something2 = Physics2D.OverlapBox(WallJump_Right_Hitbox_Location.position, WallJump_Hitbox_Size, WallJump_ColisionLayer);
+
+        //if (Is_Something) {
+
+        //    Is_Something = Physics2D.OverlapBox(WallJump_Left_Hitbox_Location.position, WallJump_Hitbox_Size, WallJump_ColisionLayer).CompareTag("World");
+
+        //} else {
+
+        //    Is_Something = false;
+        //}
+
+        //if (Is_Something2) {
+
+        //    Is_Something2 = Physics2D.OverlapBox(WallJump_Right_Hitbox_Location.position, WallJump_Hitbox_Size, WallJump_ColisionLayer).CompareTag("World");
+
+        //} else {
+
+        //    Is_Something2 = false;
+        //}
+
+        //isWall = (Is_Something || Is_Something2);
     }
 
     // ***************************************************************************************** \\
@@ -316,6 +374,7 @@ public class Player_controle : MonoBehaviour {
             this.GetComponent<BoxCollider2D>().offset = new Vector2(0.08f, -0.07f);
 
             Action_Transform.transform.rotation = Quaternion.Euler(0f, 180f, 0f);
+            Wall_Transform.rotation = Quaternion.Euler(0f, 180f, 0f);
 
             _Animator.SetBool("B_Anim_Run", true);
 
@@ -326,6 +385,7 @@ public class Player_controle : MonoBehaviour {
             this.GetComponent<BoxCollider2D>().offset = new Vector2(-0.08f, -0.07f);
 
             Action_Transform.transform.rotation = Quaternion.Euler(0f, 0f, 0f);
+            Wall_Transform.rotation = Quaternion.Euler(0f, 0f, 0f);
 
             _Animator.SetBool("B_Anim_Run", true);
 
