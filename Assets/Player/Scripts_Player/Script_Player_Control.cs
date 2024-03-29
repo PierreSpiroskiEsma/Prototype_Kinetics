@@ -191,7 +191,7 @@ public class Player_controle : MonoBehaviour {
 
                 isGrounded = true;
 
-                Debug.Log(Object.name);
+                //Debug.Log(Object.name);
 
             }
         }
@@ -211,7 +211,7 @@ public class Player_controle : MonoBehaviour {
 
                 isWall = true;
 
-                Debug.Log(Object.name);
+               // Debug.Log(Object.name);
 
             }
         }

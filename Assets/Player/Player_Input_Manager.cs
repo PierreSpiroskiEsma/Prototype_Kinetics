@@ -238,10 +238,10 @@ public partial class @Player_Input_Manager: IInputActionCollection2, IDisposable
                 {
                     ""name"": """",
                     ""id"": ""f8d1bee0-9bb8-4870-9fa3-687d4c787296"",
-                    ""path"": ""<Keyboard>/1"",
+                    ""path"": ""<Mouse>/leftButton"",
                     ""interactions"": """",
                     ""processors"": """",
-                    ""groups"": ""Gamepad"",
+                    ""groups"": ""Keyboard&Mouse"",
                     ""action"": ""Attack"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
