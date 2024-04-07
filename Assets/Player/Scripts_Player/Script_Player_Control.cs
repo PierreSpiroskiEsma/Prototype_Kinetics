@@ -1,12 +1,13 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using Unity.VisualScripting;
+using UnityEditor;
 using UnityEngine;
-using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
+using UnityEngine.Rendering.Universal;
 
 public class Player_controle : MonoBehaviour {
+
 
     private Animator _Animator;
     private SpriteRenderer _SpriteRenderer;
@@ -14,35 +15,45 @@ public class Player_controle : MonoBehaviour {
     private Vector2 Mouve_Direction;
 
     //GroundCheck Overlap
-    [SerializeField] Transform groundCheck;
-    [SerializeField] float groundCheckRadius;
-    [SerializeField] LayerMask CollisionsLayers;
+    [Header("GroundCheck")]
+    [SerializeField] Transform Ground_Check_Position;
+    [SerializeField] float Ground_Check_Radius;
+    [SerializeField] LayerMask Ground_Check_Layer;
 
     //WallJump Overlap
-    [SerializeField] Transform WallJump_Right_Hitbox_Location;
-    [SerializeField] Transform WallJump_Left_Hitbox_Location;
+    [Header("WallJump")]
+    [SerializeField] Transform WallJump_Hitbox_Position;
     [SerializeField] Vector2 WallJump_Hitbox_Size;
     [SerializeField] LayerMask WallJump_ColisionLayer;
 
     //Hitbox Overlap
+    [Header("Hitbox")]
     [SerializeField] private Transform Player_Hitbox_position;
-    [SerializeField] private Vector2 Player_Hitbox_RangeSize;
+    [SerializeField] private Vector2 Player_Hitbox_Size;
     [SerializeField] private LayerMask Player_Hitbox_LayerMask;
 
+    //Use Range Overlap
+    [Header("Use Range")]
+    [SerializeField] private Transform Player_Usebox_position;
+    [SerializeField] private Vector2 Player_Usebox_Size;
+    [SerializeField] private LayerMask Player_Usebox_LayerMask;
+
     //is the player is Freeze in space
-    [SerializeField] bool Freeze = false;
+    bool Freeze = false;
 
     //the Statistic sheets of the player
+    [Header("Player Statistics Sheets")]
     [SerializeField] SciptsObject_PlayerStats Stats;
 
     //State Check
-    [SerializeField] bool Bool_Dash_Available = true;
-    [SerializeField] bool isGrounded;
-    [SerializeField] bool isWall;
+    bool Bool_Dash_Available = true;
+    bool Can_WallJump = false;
+
+    bool isGrounded, isWall, Can_Dash, Essence_IsActive;
 
     //Essence System
     [SerializeField] int[] Essence_Inventory = new int[3];
-    private bool Essence_IsActive;
+    private Light2D Light_Essence_Use;
 
     //Input Manager
     private Player_Input_Manager _inputManager;
@@ -61,15 +72,6 @@ public class Player_controle : MonoBehaviour {
 
     private void Awake() {
 
-        _Animator = this.GetComponent<Animator>();
-        _SpriteRenderer = this.GetComponent<SpriteRenderer>();
-        _rigidbody = this.GetComponent<Rigidbody2D>();
-
-        Action_Transform = this.transform.Find("Action");
-        Wall_Transform = this.transform.Find("WallJump");
-
-        ParticleBox = this.transform.Find("Essence_Particle_Box").GetComponent<Script_Essence_Praticle_Rotation>();
-
         _inputManager = new Player_Input_Manager();
 
         _moveAction = _inputManager.Player.Move;
@@ -84,7 +86,24 @@ public class Player_controle : MonoBehaviour {
 
     private void OnEnable() {
 
+        _Animator = this.GetComponent<Animator>();
+        _SpriteRenderer = this.GetComponent<SpriteRenderer>();
+        _rigidbody = this.GetComponent<Rigidbody2D>();
+
+        Ground_Check_Position = transform.Find("Overlap_Jump").GetComponent<Transform>();
+        Player_Usebox_position = transform.Find("Action").transform.Find("UseBox").GetComponent<Transform>();
+        Player_Hitbox_position = transform.Find("Action").transform.Find("Attack").transform.Find("Hitbox_Position").GetComponent<Transform>();
+        WallJump_Hitbox_Position = transform.Find("WallJump").transform.Find("Overlap_WallJump").GetComponent<Transform>();
+
+        Light_Essence_Use = transform.Find("Action").transform.Find("UseBox").GetComponentInChildren<Light2D>();
+
+        Action_Transform = this.transform.Find("Action");
+        Wall_Transform = this.transform.Find("WallJump");
+
+        ParticleBox = this.transform.Find("Essence_Particle_Box").GetComponent<Script_Essence_Praticle_Rotation>();
+
         Essence_IsActive = false;
+        Can_Dash = true;
 
         _moveAction.Enable();
         _attackAction.Enable();
@@ -95,10 +114,12 @@ public class Player_controle : MonoBehaviour {
         _jumpAction.Enable();
 
         _jumpAction.performed += OnJump;
+        _jumpAction.canceled += OffJump;
         _attackAction.performed += OnAttack;
         _essenceAction.performed += OnEssence;
         _blockAction.performed += OnBlock;
         _moveAction.performed += OnMouve;
+        _dashAction.performed += OnDash;
     }
 
     private void OnDisable() {
@@ -112,17 +133,20 @@ public class Player_controle : MonoBehaviour {
         _jumpAction.Disable();
 
         _jumpAction.performed -= OnJump;
+        _jumpAction.canceled -= OffJump;
         _attackAction.performed -= OnAttack;
         _essenceAction.performed -= OnEssence;
         _blockAction.performed -= OnBlock;
         _moveAction.performed -= OnMouve;
+        _dashAction.performed -= OnDash;
     }
+
+
 
     // ***************************************************************************************** \\
     // START
     // ***************************************************************************************** \\
-    void Start()
-    {
+    void Start() {
 
         //Initialisation of the actual player speed based on his Speed statistic
         Speed_Reset();
@@ -137,41 +161,38 @@ public class Player_controle : MonoBehaviour {
 
         // ************** Ground Detection ************** \\
 
-        //groundCheck.position = new Vector2(this.transform.position.x + this.GetComponent<BoxCollider2D>().offset.x, groundCheck.position.y);
-
-
         Ground_Detection();
         Wall_Detection();
-
-
-
-        //isWall = Physics2D.OverlapBox(WallJump_Right_Hitbox_Location.position, WallJump_Hitbox_Size, WallJump_ColisionLayer).CompareTag("World") || Physics2D.OverlapBox(WallJump_Left_Hitbox_Location.position, WallJump_Hitbox_Size, WallJump_ColisionLayer).CompareTag("World");
-
-        if (isGrounded) {
-            animate_jump(false);
-        } else {
-            animate_jump(true);
-        }
-
-        Mouve_Direction = _moveAction.ReadValue<Vector2>();
-        Vector2 Player_Velocity = _rigidbody.velocity;
-        Player_Velocity.x = Stats.Get_Player_Speed() * Mouve_Direction.x;
-        _rigidbody.velocity = Player_Velocity;
-
+        Fall_detection();
+        Mouvement_Update_function();
         animate_StopRun();
     }
+
+
 
     // ***************************************************************************************** \\
     // Development Tool
     // ***************************************************************************************** \\
 
-    private void OnDrawGizmos()
-    {
+    private void OnDrawGizmos() {
         // rendu et position du cercle sous le joueur 
-        Gizmos.color = Color.blue;
-        Gizmos.DrawWireSphere(groundCheck.position, groundCheckRadius);
-        Gizmos.DrawWireCube(WallJump_Right_Hitbox_Location.position, WallJump_Hitbox_Size);
-        Gizmos.DrawWireCube(Player_Hitbox_position.position, Player_Hitbox_RangeSize);
+        if (isGrounded) {
+            Gizmos.color = Color.yellow;
+        } else {
+            Gizmos.color = Color.blue;
+        }
+        Gizmos.DrawWireSphere(Ground_Check_Position.position, Ground_Check_Radius);
+
+        if (isWall) {
+            Gizmos.color = Color.yellow;
+        } else {
+            Gizmos.color = Color.blue;
+        }
+        Gizmos.DrawWireCube(WallJump_Hitbox_Position.position, WallJump_Hitbox_Size);
+
+
+        Gizmos.color = Color.red;
+        Gizmos.DrawWireCube(Player_Hitbox_position.position, Player_Hitbox_Size);
     }
 
     // ***************************************************************************************** \\
@@ -181,7 +202,7 @@ public class Player_controle : MonoBehaviour {
     // --- GROUND --- \\
     private void Ground_Detection() {
 
-        Collider2D[] Ground_Detection = Physics2D.OverlapCircleAll(groundCheck.position, groundCheckRadius, CollisionsLayers);
+        Collider2D[] Ground_Detection = Physics2D.OverlapCircleAll(Ground_Check_Position.position, Ground_Check_Radius, Ground_Check_Layer);
 
         isGrounded = false;
 
@@ -190,9 +211,6 @@ public class Player_controle : MonoBehaviour {
             if (Object.tag == "World") {
 
                 isGrounded = true;
-
-                //Debug.Log(Object.name);
-
             }
         }
     }
@@ -201,7 +219,7 @@ public class Player_controle : MonoBehaviour {
     private void Wall_Detection() {
 
 
-        Collider2D[] Wall_Detection = Physics2D.OverlapBoxAll(WallJump_Right_Hitbox_Location.position, WallJump_Hitbox_Size, WallJump_ColisionLayer);
+        Collider2D[] Wall_Detection = Physics2D.OverlapBoxAll(WallJump_Hitbox_Position.position, WallJump_Hitbox_Size, WallJump_ColisionLayer);
 
         isWall = false;
 
@@ -210,43 +228,34 @@ public class Player_controle : MonoBehaviour {
             if (Object.tag == "World") {
 
                 isWall = true;
-
-               // Debug.Log(Object.name);
-
             }
         }
+    }
 
-        //bool Is_Something = Physics2D.OverlapBox(WallJump_Left_Hitbox_Location.position, WallJump_Hitbox_Size, WallJump_ColisionLayer);
-        //bool Is_Something2 = Physics2D.OverlapBox(WallJump_Right_Hitbox_Location.position, WallJump_Hitbox_Size, WallJump_ColisionLayer);
+    private void Fall_detection() {
+        if (isGrounded) {
 
-        //if (Is_Something) {
+            animate_jump(false);
 
-        //    Is_Something = Physics2D.OverlapBox(WallJump_Left_Hitbox_Location.position, WallJump_Hitbox_Size, WallJump_ColisionLayer).CompareTag("World");
+        } else {
 
-        //} else {
-
-        //    Is_Something = false;
-        //}
-
-        //if (Is_Something2) {
-
-        //    Is_Something2 = Physics2D.OverlapBox(WallJump_Right_Hitbox_Location.position, WallJump_Hitbox_Size, WallJump_ColisionLayer).CompareTag("World");
-
-        //} else {
-
-        //    Is_Something2 = false;
-        //}
-
-        //isWall = (Is_Something || Is_Something2);
+            animate_jump(true);
+        }
     }
 
     // ***************************************************************************************** \\
     // Cinematic setting
     // ***************************************************************************************** \\
 
-    public void FreezOn() { Freeze = true; }
+    public void FreezOn() {
 
-    public void FreezOff() { Freeze = false; }
+        Freeze = true; 
+    }
+
+    public void FreezOff() { 
+
+        Freeze = false; 
+    }
 
 
     // ***************************************************************************************** \\
@@ -254,11 +263,27 @@ public class Player_controle : MonoBehaviour {
     // ***************************************************************************************** \\
 
     // --- JUMP --- \\
-   private void OnJump(InputAction.CallbackContext context) {
+    private void OnJump(InputAction.CallbackContext context) {
 
-        Debug.Log("Jump");
+        if (Essence_IsActive && isGrounded) {
 
-   }
+            Essence_Use(4);
+
+        } else if (isGrounded || (isWall && Can_WallJump)) {
+
+            _rigidbody.velocity = new Vector2(_rigidbody.velocity.x, Stats.Get_PlayerStatistics_Jump_Speed());
+        }
+
+
+    }
+
+    private void OffJump(InputAction.CallbackContext context) {
+
+        if (_rigidbody.velocity.y > 0) {
+
+            _rigidbody.velocity = new Vector2(_rigidbody.velocity.x, _rigidbody.velocity.y * 0.5f);
+        }
+    }
 
     // --- ATTACK --- \\
     private void OnAttack(InputAction.CallbackContext context) {
@@ -281,19 +306,20 @@ public class Player_controle : MonoBehaviour {
     private void OnEssence(InputAction.CallbackContext context) {
 
         Essence_IsActive = true;
+        Essence_use_Light_control();
     }
 
     // --- BLOCK --- \\
     private void OnBlock(InputAction.CallbackContext context) {
 
-        if (Essence_IsActive) {
+        if (Essence_IsActive && (Essence_Type_Check() != 0)) {
 
-            Essence_IsActive = false;
-            Debug.Log("Essence Use is cancel + Block");
+            Essence_Use(2);
 
         } else {
 
             Debug.Log("Block");
+            Essence_IsActive = false;
         }
 
     }
@@ -305,6 +331,30 @@ public class Player_controle : MonoBehaviour {
 
     }
 
+    void Mouvement_Update_function() {
+
+        Mouve_Direction = _moveAction.ReadValue<Vector2>();
+        Vector2 Player_Velocity = _rigidbody.velocity;
+
+        Player_Velocity.x = (Stats.Get_Player_Speed() * Mouve_Direction.x) ;
+        _rigidbody.velocity = Player_Velocity;
+    }
+
+    // --- DASH --- \\
+    private void OnDash(InputAction.CallbackContext context) {
+        if (Can_Dash) {
+            if (Essence_IsActive) {
+
+                Essence_Use(3);
+
+            } else {
+
+                StartCoroutine(Routine_Default_Dash());
+            }
+        }
+    }
+
+
     // ***************************************************************************************** \\
     // Action
     // ***************************************************************************************** \\
@@ -312,7 +362,7 @@ public class Player_controle : MonoBehaviour {
 
     void Attack_Normal() {
 
-        Collider2D[] Player_Hitbox = Physics2D.OverlapBoxAll(Player_Hitbox_position.position, Player_Hitbox_RangeSize, Player_Hitbox_LayerMask);
+        Collider2D[] Player_Hitbox = Physics2D.OverlapBoxAll(Player_Hitbox_position.position, Player_Hitbox_Size, Player_Hitbox_LayerMask);
 
         foreach (var Enemy in Player_Hitbox) {
 
@@ -330,38 +380,17 @@ public class Player_controle : MonoBehaviour {
 
     }
 
-    void Dash_Accelerate() {
-        Stats.Set_Player_Speed(Stats.Get_PlayerStatistics_Speed() * Stats.Get_PlayerStatistics_Dash_Speed());
-    }
-
-    void Dash_Deccelerate() {
-        Stats.Set_Player_Speed(Stats.Get_PlayerStatistics_Speed() / 2);
-    }
-
     void Speed_Reset() {
         Stats.Set_Player_Speed(Stats.Get_PlayerStatistics_Speed());
     }
 
-    void go_dash() {
+    //void Dash_Accelerate() {
+    //    Stats.Set_Player_Speed(Stats.Get_PlayerStatistics_Speed() * Stats.Get_PlayerStatistics_Dash_Speed());
+    //}
 
-        StartCoroutine(Fonction_Dash());            
-        Animate_Dash_On();
-
-    }
-
-    void go_jump() {
-
-        if (isGrounded) {
-
-            Debug.Log("try jumping");
-            Debug.Log(Stats.Get_PlayerStatistics_Jump_Speed());
-            Debug.Log(Stats.Get_PlayerStatistics_Jump_Speed() * Time.deltaTime);
-            _rigidbody.velocity = new Vector2(_rigidbody.velocity.x, (Stats.Get_PlayerStatistics_Jump_Speed() * Time.deltaTime));
-
-        }
-
-
-    }
+    //void Dash_Deccelerate() {
+    //    Stats.Set_Player_Speed(Stats.Get_PlayerStatistics_Speed() / 2);
+    //}
 
     // ***************************************************************************************** \\
     // animation 
@@ -371,7 +400,7 @@ public class Player_controle : MonoBehaviour {
 
         if (Mouve_Direction.x < -0.2f) {
 
-            this.GetComponent<BoxCollider2D>().offset = new Vector2(0.08f, -0.07f);
+            //this.GetComponent<CapsuleCollider2D>().offset = new Vector2(0.08f, -0.07f);
 
             Action_Transform.transform.rotation = Quaternion.Euler(0f, 180f, 0f);
             Wall_Transform.rotation = Quaternion.Euler(0f, 180f, 0f);
@@ -382,7 +411,7 @@ public class Player_controle : MonoBehaviour {
 
         } else if (Mouve_Direction.x > 0.2f) {
 
-            this.GetComponent<BoxCollider2D>().offset = new Vector2(-0.08f, -0.07f);
+            //this.GetComponent<CapsuleCollider2D>().offset = new Vector2(-0.08f, -0.07f);
 
             Action_Transform.transform.rotation = Quaternion.Euler(0f, 0f, 0f);
             Wall_Transform.rotation = Quaternion.Euler(0f, 0f, 0f);
@@ -463,50 +492,46 @@ public class Player_controle : MonoBehaviour {
             }
         }
 
-        transform.GetChild(0).gameObject.SetActive(set);
+        transform.Find("Essence_Particle_Box").gameObject.SetActive(set);
 
         return true;
     }
     // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! \\
 
 
-    // GET
+    // --- GET --- \\
+    public bool Essence_Get(int New_Essence, int Action_Type) {
 
-    public bool Essence_Get (int New_Essence, int Action_Type) {
+        if (Action_Type == 1 || Action_Type == 2) {
 
-    if (Action_Type ==  1 || Action_Type == 2) {
+            if (Essence_Inventory[Essence_Inventory.Length - 1] != 0) {
 
-        if (Essence_Inventory[Essence_Inventory.Length - 1] != 0) {
+                Debug.Log("Essence Pool is full, Damage taken");
+                return false;
 
-            Debug.Log("Essence Pool is full, Damage taken");
-            return false;
-
+            }
         }
+
+        for (int i = 0; i < Essence_Inventory.Length; i++) {
+
+            if (Essence_Inventory[i] == 0) {
+
+                Essence_Inventory[i] = New_Essence;
+                Debug.Log("Essence " + New_Essence + " Has been added to the slots " + (i));
+                Essence_Lit();
+                return true;
+
+            }
+        }
+
+        Debug.Log("Essence Pool is full, No Essense has been add");
+        return false;
     }
 
-    for (int i = 0; i < Essence_Inventory.Length; i++) {
 
-        if (Essence_Inventory[i] == 0) {
-
-            Essence_Inventory[i] = New_Essence;
-            Debug.Log("Essence " + New_Essence + " Has been added to the slots " + (i));
-            Essence_Lit();
-            return true;
-
-        } 
-    }
-
-    Debug.Log("Essence Pool is full, No Essense has been add");
-    return false;
-}
-
-
-// USE
-
-
-bool Essence_Use(int Action_Type) {
-    for (int i = 0; i < Essence_Inventory.Length; i++) {
-        int Essence_Type = Essence_Inventory[Essence_Inventory.Length - (i + 1)];
+    // --- USE --- \\
+    bool Essence_Use(int Action_Type) {
+            int Essence_Type = Essence_Type_Check();
 
         if (Essence_Type != 0) {
 
@@ -517,45 +542,65 @@ bool Essence_Use(int Action_Type) {
 
                     switch (Essence_Type) {
 
-                        case 1 :
+                        case 1:
+
                             Debug.Log("Strong Attack");
+
                         break;
 
-                        case 2 :
+                        case 2:
+
                             Debug.Log("Speed Attack");
+
                         break;
 
-                        case 3 :
+                        case 3:
+
                             Debug.Log("Ranged Attack");
+
                         break;
 
                         default: return false;
                     }
 
-                break; 
+                break;
 
                 //Block
                 case 2:
 
-                    Debug.Log("Block"); // cancel la magie et ne la suprime pas de la reserve
+                    Debug.Log("Essence Cancel"); // cancel la magie et ne la suprime pas de la reserve
+
+                    Light_Essence_Use.intensity = 0f;
+
+                    Essence_IsActive = false;
 
                 return true;
 
                 //Sprint
                 case 3:
 
+                    Light_Essence_Use.intensity = 1.5f;
+
                     switch (Essence_Type) {
 
                         case 1:
-                            Debug.Log("Charge");
+                                
+                            StartCoroutine(Routine_Power_Dash());
+
                         break;
 
                         case 2:
-                            Debug.Log("Super Speed");
+                                
+                            StartCoroutine(Routine_Speed_Dash());
+
                         break;
 
                         case 3:
-                            Debug.Log("Teleport");
+
+                            this.transform.position = transform.Find("Action").transform.Find("Teleport_dash").GetComponent<Transform>().position;
+
+                            Light_Essence_Use.intensity = 0f;
+
                         break;
 
                         default: return false;
@@ -566,19 +611,31 @@ bool Essence_Use(int Action_Type) {
                 //Jump
                 case 4:
 
+                    Light_Essence_Use.intensity = 1.5f;
+
                     switch (Essence_Type) {
 
                         case 1:
-                            Debug.Log("Big Jump");
+
+                            _rigidbody.velocity = new Vector2(_rigidbody.velocity.x, Stats.Get_PlayerStatistics_Jump_Speed() * 3);
+
+                            Light_Essence_Use.intensity = 0f;
+
                         break;
 
                         case 2:
-                            Debug.Log("Wall Jump");
+
+                            StartCoroutine(Fonction_Walljump());
+
                         break;
 
                         case 3:
-                            Debug.Log("Teleport");
-                        break;
+
+                            this.transform.position = transform.Find("Teleport_jump").GetComponent<Transform>().position;
+
+                            Light_Essence_Use.intensity = 0f;
+
+                            break;
 
                         default: return false;
                     }
@@ -591,15 +648,21 @@ bool Essence_Use(int Action_Type) {
                     switch (Essence_Type) {
 
                         case 1:
+
                             Debug.Log("Power Taunt");
+
                         break;
 
                         case 2:
+
                             Debug.Log("Speed Taunt");
+
                         break;
 
                         case 3:
+
                             Debug.Log("Range Taunt");
+
                         break;
 
                         default: return false;
@@ -608,52 +671,155 @@ bool Essence_Use(int Action_Type) {
                 break;
             }
 
-            Essence_Inventory[Essence_Inventory.Length - (i + 1)] = 0;
-            Debug.Log("Essence " + Essence_Inventory[Essence_Inventory.Length - (i + 1)] + " Has Been used");
+
+            Debug.Log("Essence " + Essence_Type_Check() + " Has Been used");
+            Essence_Use_Clean();
+
+            Essence_IsActive = false;
+
             Essence_Lit();
             return true;
+            
+        }
+
+        Debug.Log("No Essence Avaiable");
+        Essence_Lit();
+        return false;
+    }
+
+    // --- VANITY --- \\
+    void Essence_use_Light_control() {
+
+        Light_Essence_Use.intensity = 0.5f;
+
+        switch (Essence_Type_Check()) {
+
+            case 1:
+
+                Light_Essence_Use.color = new Color(1f, 0f, 0f, 1f);
+
+            break;
+
+            case 2:
+
+                Light_Essence_Use.color = new Color(0f, 0f, 1f, 1f);
+
+            break;
+
+            case 3:
+
+                Light_Essence_Use.color = new Color(1f, 1f, 0f, 1f);
+
+            break;
+
+            default:
+
+                Light_Essence_Use.color = new Color(0f, 0f, 0f, 1f);
+                Light_Essence_Use.intensity = 0f;
+
+            break;
+        }
+
+    }
+
+    // --- TYPE CHECK --- \\
+    int Essence_Type_Check() {
+
+        for (int i = Essence_Inventory.Length-1; i >= 0; i--)
+        {
+            if (Essence_Inventory[i] != 0)
+            {
+                return Essence_Inventory[i];
+            }
+        }
+
+        return 0;
+
+    }
+
+    void Essence_Use_Clean() {
+
+        for (int i = Essence_Inventory.Length - 1; i >= 0; i--) {
+
+            if (Essence_Inventory[i] != 0) {
+
+                Essence_Inventory[i] = 0;
+                break;
+            }
         }
     }
 
-    Debug.Log("No Essence Avaiable");
-    Essence_Lit();
-    return false;
-}
+    // ***************************************************************************************** \\
+    // Dash
+    // ***************************************************************************************** \\
 
-// ***************************************************************************************** \\
-// OLD fonction d'input 
-// ***************************************************************************************** \\
-void player_mouvement() {
 
-    //jump
-    if (Input.GetKey(KeyCode.UpArrow)) {
-        go_jump();
-    };
+    // --- DEFAULT DASH --- \\
+    IEnumerator Routine_Default_Dash() {
 
-    if (Input.GetKeyDown(KeyCode.Keypad2)) {
+        Stats.Set_Player_Speed(Stats.Get_PlayerStatistics_Speed() * Stats.Get_PlayerStatistics_Dash_Speed());
 
-        Essence_Use(2);
+        //couldown
+        yield return new WaitForSeconds(Stats.Get_PlayerStatistics_Dash_Duration());
+
+        Speed_Reset();
+        Light_Essence_Use.intensity = 0f;
+
+        yield return new WaitForSeconds(Stats.Get_PlayerStatistics_Dash_Couldown());
+        Can_Dash = true;
     }
 
-    //dash
-    if (Input.GetKeyDown(KeyCode.Keypad3) && Bool_Dash_Available) {
-        go_dash();
-        Animate_Dash_On();
+
+    // --- SPEED DASH --- \\
+    IEnumerator Routine_Speed_Dash() {
+
+        Stats.Set_Player_Speed(Stats.Get_PlayerStatistics_Speed() * (Stats.Get_PlayerStatistics_Dash_Speed() * 2));
+
+        //couldown
+        yield return new WaitForSeconds(Stats.Get_PlayerStatistics_Dash_Duration());
+
+        Speed_Reset();
+        Light_Essence_Use.intensity = 0f;
+
+        yield return new WaitForSeconds(Stats.Get_PlayerStatistics_Dash_Couldown());
+        Can_Dash = true;
     }
 
-}
 
-// ************** Dash ************** \\
+    // --- POWER DASH --- \\
+    IEnumerator Routine_Power_Dash() {
 
-IEnumerator Fonction_Dash()
-{
+        Debug.Log("Power Dash on");
 
-    Bool_Dash_Available = false;
+        //couldown
+        yield return new WaitForSeconds(Stats.Get_PlayerStatistics_Walljump_duration());
 
-    //couldown
-    yield return new WaitForSeconds(Stats.Get_PlayerStatistics_Dash_Couldown());
+        Speed_Reset();
+        Light_Essence_Use.intensity = 0f;
+        Debug.Log("Power Dash off");
 
-    Bool_Dash_Available = true;
+        yield return new WaitForSeconds(Stats.Get_PlayerStatistics_Dash_Couldown());
+        Can_Dash = true;
+    }
 
-}
+    // ***************************************************************************************** \\
+    // WallJump
+    // ***************************************************************************************** \\
+
+
+    IEnumerator Fonction_Walljump() {
+
+        Can_WallJump = true;
+        Debug.Log("wall start");
+
+        //couldown
+        yield return new WaitForSeconds(Stats.Get_PlayerStatistics_Walljump_duration());
+
+        Can_WallJump = false;
+        Debug.Log("wall finished");
+
+        Light_Essence_Use.intensity = 0f;
+
+    }
+
 }

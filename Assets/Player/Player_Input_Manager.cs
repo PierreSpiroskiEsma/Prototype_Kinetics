@@ -38,12 +38,12 @@ public partial class @Player_Input_Manager: IInputActionCollection2, IDisposable
                 },
                 {
                     ""name"": ""Jump"",
-                    ""type"": ""Button"",
+                    ""type"": ""Value"",
                     ""id"": ""6d982ffb-4ac2-4768-a82c-2097816ed23c"",
                     ""expectedControlType"": ""Button"",
                     ""processors"": """",
                     ""interactions"": """",
-                    ""initialStateCheck"": false
+                    ""initialStateCheck"": true
                 },
                 {
                     ""name"": ""Attack"",
@@ -161,7 +161,7 @@ public partial class @Player_Input_Manager: IInputActionCollection2, IDisposable
                 {
                     ""name"": ""left"",
                     ""id"": ""d2581a9b-1d11-4566-b27d-b92aff5fabbc"",
-                    ""path"": ""<Keyboard>/a"",
+                    ""path"": ""<Keyboard>/q"",
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": "";Keyboard&Mouse"",

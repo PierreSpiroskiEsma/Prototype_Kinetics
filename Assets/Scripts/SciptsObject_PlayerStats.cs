@@ -42,4 +42,8 @@ public class SciptsObject_PlayerStats : ScriptableObject
     [SerializeField] private float PlayerStatistics_Essence_Slot= 2;
     public float Get_PlayerStatistics_Essence_Slot() { return PlayerStatistics_Dash_Couldown; }
     public void Set_PlayerStatistics_Essence_Slot(float Quantity) { PlayerStatistics_Dash_Couldown = Quantity; }
+
+    [SerializeField] float PlayerStatistics_Walljump_duration = 10f;
+    public float Get_PlayerStatistics_Walljump_duration() { return PlayerStatistics_Walljump_duration; }
+    public void Set_PlayerStatistics_Walljump_duration(float duration) { PlayerStatistics_Walljump_duration = duration; }
 }

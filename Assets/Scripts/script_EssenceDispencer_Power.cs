@@ -64,5 +64,10 @@ public class script_EssenceDispencer_Power : MonoBehaviour
         isActive = false;
     }
 
+    public int Get_EssenceType() {
+        return Essence_Type;
+    }
+
+
 
 }
