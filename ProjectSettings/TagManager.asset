@@ -7,6 +7,7 @@ TagManager:
   - World
   - Background
   - Enemy
+  - Essence Source
   layers:
   - Default
   - TransparentFX

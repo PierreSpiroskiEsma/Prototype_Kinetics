@@ -120,6 +120,7 @@ public class Player_controle : MonoBehaviour {
         _blockAction.performed += OnBlock;
         _moveAction.performed += OnMouve;
         _dashAction.performed += OnDash;
+        _interactAction.performed += OnInteract;
     }
 
     private void OnDisable() {
@@ -139,6 +140,7 @@ public class Player_controle : MonoBehaviour {
         _blockAction.performed -= OnBlock;
         _moveAction.performed -= OnMouve;
         _dashAction.performed -= OnDash;
+        _interactAction.performed -= OnInteract;
     }
 
 
@@ -232,6 +234,7 @@ public class Player_controle : MonoBehaviour {
         }
     }
 
+    // --- FALL --- \\
     private void Fall_detection() {
         if (isGrounded) {
 
@@ -242,6 +245,11 @@ public class Player_controle : MonoBehaviour {
             animate_jump(true);
         }
     }
+
+    // --- ESSENCE SOURCE --- \\
+
+
+ 
 
     // ***************************************************************************************** \\
     // Cinematic setting
@@ -305,8 +313,10 @@ public class Player_controle : MonoBehaviour {
     // --- ESSENCE --- \\
     private void OnEssence(InputAction.CallbackContext context) {
 
-        Essence_IsActive = true;
-        Essence_use_Light_control();
+        if (Essence_Type_Check() != 0) {
+            Essence_IsActive = true;
+            Essence_use_Light_control();
+        }
     }
 
     // --- BLOCK --- \\
@@ -350,6 +360,27 @@ public class Player_controle : MonoBehaviour {
             } else {
 
                 StartCoroutine(Routine_Default_Dash());
+            }
+        }
+    }
+
+    // --- INTERACT --- \\
+    private void OnInteract(InputAction.CallbackContext context) {
+
+        Collider2D[] Essence_Source_Detection = Physics2D.OverlapBoxAll(WallJump_Hitbox_Position.position, WallJump_Hitbox_Size, WallJump_ColisionLayer);
+
+        foreach (var Object in Essence_Source_Detection) {
+
+            if (Object.tag == "Essence Source") {
+
+                if (Object.GetComponent<script_EssenceDispencer_Power>().Essence_Consume()) {
+
+                    Essence_Get(Object.GetComponent<script_EssenceDispencer_Power>().Get_EssenceType(), 2);
+
+                } else {
+
+                    Debug.Log("Pillier Desactiver");
+                }
             }
         }
     }
