@@ -29,28 +29,26 @@ public class script_EssenceDispencer_Power : MonoBehaviour
             case Essence.Power:
                 
                 Essence_Type = 1;
+                obj_light.color = new Color(1f, 0f, 0f);
 
             break;
 
             case Essence.Speed:
                 
                 Essence_Type = 2;
+                obj_light.color = new Color(0.19f, 0.92f, 0.82f);
 
             break; 
 
             case Essence.Range:
                 
                 Essence_Type = 3;
+                obj_light.color = new Color(0.92f, 0.78f, 0.19f);
 
             break;
         }
     }
 
-    private void Start() {
-
-        Pylone_type_selector(Essence_Type);
-
-    }
     private void Update() {
 
         if (isActive) {
@@ -62,30 +60,6 @@ public class script_EssenceDispencer_Power : MonoBehaviour
             obj_light.intensity = 0f;
         }
 
-    }
-
-    private void Pylone_type_selector(int set) {
-
-        switch (set) {
-
-            case 1:
-
-                obj_light.color = new Color(1f, 0f, 0f);
-
-            break;
-                
-            case 2:
-
-                obj_light.color = new Color(0.19f, 0.92f, 0.82f);
-
-            break; 
-
-            case 3:
-
-                obj_light.color = new Color(0.92f, 0.78f, 0.19f);
-
-            break;
-        }
     }
 
     public int Get_EssenceType() {
