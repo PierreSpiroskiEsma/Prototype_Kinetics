@@ -14,9 +14,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   PlayerStatistics_Speed: 300
   Player_Speed: 300
-  PlayerStatistics_Jump_Speed: 10
+  PlayerStatistics_Jump_Speed: 11
   PlayerStatistics_Dash_Speed: 4
   PlayerStatistics_Dash_Duration: 0.1
   PlayerStatistics_Dash_Couldown: 10
   PlayerStatistics_Essence_Slot: 2
-  PlayerStatistics_Impulse_power: 2
+  PlayerStatistics_Walljump_duration: 10

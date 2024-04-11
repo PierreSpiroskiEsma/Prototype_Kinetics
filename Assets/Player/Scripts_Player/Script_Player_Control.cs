@@ -697,7 +697,7 @@ public class Player_controle : MonoBehaviour {
 
                         case 1:
 
-                            _rigidbody.velocity = new Vector2(_rigidbody.velocity.x, Stats.Get_PlayerStatistics_Jump_Speed() * 3);
+                            _rigidbody.velocity = new Vector2(_rigidbody.velocity.x, Stats.Get_PlayerStatistics_Jump_Speed() * 1.5f);
 
                             Essence_light_off();
 
