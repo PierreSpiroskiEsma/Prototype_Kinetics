@@ -8,6 +8,7 @@ TagManager:
   - Background
   - Enemy
   - Essence Source
+  - Destructible
   layers:
   - Default
   - TransparentFX

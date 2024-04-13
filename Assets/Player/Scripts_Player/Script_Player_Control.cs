@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -46,7 +47,7 @@ public class Player_controle : MonoBehaviour {
     bool Can_WallJump, Can_Dash, Can_Charge;
 
     //State check
-    bool Is_Grounded, Is_Wall , Is_Essence_Active, Is_Attack_Default, Is_Front;
+    bool Is_Grounded, Is_Wall , Is_Essence_Active, Is_Attack_Default, Is_Front, Is_Charge;
 
     //Essence System
     [SerializeField] int[] Essence_Inventory = new int[3];
@@ -103,6 +104,7 @@ public class Player_controle : MonoBehaviour {
         Can_Dash = true;
         Can_WallJump = false;
         Can_Charge = false;
+        Is_Charge = false;
 
         _moveAction.Enable();
         _attackAction.Enable();
@@ -169,9 +171,13 @@ public class Player_controle : MonoBehaviour {
             Mouvement_Update_function(); 
         }
 
+        if (Is_Charge) {
+
+            Wall_Destroyeur();
+        }
+
         animate_StopRun();
     }
-
 
 
     // ***************************************************************************************** \\
@@ -393,9 +399,9 @@ public class Player_controle : MonoBehaviour {
     // --- INTERACT --- \\
     private void OnInteract(InputAction.CallbackContext context) {
 
-        Collider2D[] Essence_Source_Detection = Physics2D.OverlapBoxAll(WallJump_Hitbox_Position.position, WallJump_Hitbox_Size, WallJump_ColisionLayer);
+        Collider2D[] UseBox_Overlap = Physics2D.OverlapBoxAll(Player_Usebox_position.position, Player_Usebox_Size, Player_Usebox_LayerMask);
 
-        foreach (var Object in Essence_Source_Detection) {
+        foreach (var Object in UseBox_Overlap) {
 
             if (Object.tag == "Essence Source") {
 
@@ -877,17 +883,36 @@ public class Player_controle : MonoBehaviour {
     IEnumerator Routine_Power_Dash() {
 
         Debug.Log("Power Dash on");
-
+        Is_Charge = true;
         //couldown
         yield return new WaitForSeconds(Stats.Get_PlayerStatistics_Walljump_duration());
 
-        Speed_Reset();
+        Is_Charge = false;
         Essence_light_off();
         Debug.Log("Power Dash off");
 
         yield return new WaitForSeconds(Stats.Get_PlayerStatistics_Dash_Couldown());
         Can_Dash = true;
     }
+
+    // ***************************************************************************************** \\
+    // Charge
+    // ***************************************************************************************** \\
+
+    private void Wall_Destroyeur() {
+
+        Collider2D[] UseBox_Overlap = Physics2D.OverlapBoxAll(Player_Usebox_position.position, Player_Usebox_Size, Player_Usebox_LayerMask);
+
+        foreach (var _object in UseBox_Overlap) {
+
+            if (_object.tag == "Destructible") {
+
+                _object.GetComponent<Script_Desctructible>().OnDestroy();
+            }
+        }
+
+    }
+
 
     // ***************************************************************************************** \\
     // WallJump
