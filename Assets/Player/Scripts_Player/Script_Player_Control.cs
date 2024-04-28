@@ -378,8 +378,6 @@ public class Player_controle : MonoBehaviour {
 
             Is_Front = false;
         }
-
-
     }
 
     // --- DASH --- \\

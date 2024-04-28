@@ -49,8 +49,13 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Life_Point: 3
   Enemeie_Type: 110
+  speed: 200
   Light_knockback: {x: 2, y: 5}
   Heavy_knockback: {x: 4, y: 10}
+  Target_Transform: {fileID: 0}
+  Chase_Distance: 0
+  Attack_Distance: 0
+  Is_Alive: 0
 --- !u!212 &3588811540066959094
 SpriteRenderer:
   m_ObjectHideFlags: 0
