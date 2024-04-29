@@ -1,8 +1,4 @@
-using System;
 using System.Collections;
-using System.Collections.Generic;
-using Unity.VisualScripting;
-using Unity.VisualScripting.Antlr3.Runtime.Misc;
 using UnityEngine;
 
 public class Script_BadBoi : MonoBehaviour {
@@ -13,6 +9,11 @@ public class Script_BadBoi : MonoBehaviour {
     [SerializeField] private char Enemeie_Type;
     [SerializeField] private float speed;
     [SerializeField] private float Stun_Time;
+
+    [Header("Attack Stetting")]
+    [SerializeField] private Vector2 Enemy_Hitbox_Size;
+    [SerializeField] private float Enemy_Hitbox_layermask;
+    [SerializeField] private Transform Enemy_Hitbox_Transform;
 
     // --- Knockback --- \\
     [Header("Knowkback Strenght")]
@@ -26,29 +27,36 @@ public class Script_BadBoi : MonoBehaviour {
     [SerializeField] private float actual_distance;
     [SerializeField] private float Attack_Distance;
 
+    [Header("AI Stetting")]
     [SerializeField] private bool Is_Alive;
 
     // --- State --- \\
-    private bool Is_Far, Is_Chasing, Is_Close, Is_Hit;
+    private bool Is_Far, Is_Chasing, Is_Close, Is_Hit, Is_Attack;
 
     // --- QOther --- \\
     private Rigidbody2D _RigideBody;
     private SpriteRenderer _SpriteRenderer;
+    private Animator _Animator;
+
+
 
     // ***************************************************************************************** \\
     // Setup
     // ***************************************************************************************** \\
 
-    private void Awake() {
+    private void OnEnable() {
 
         _RigideBody = this.GetComponent<Rigidbody2D>();
         _SpriteRenderer = this.GetComponent<SpriteRenderer>();
+        _Animator = this.GetComponent<Animator>();
 
         Is_Chasing = false;
         Is_Close = false;
         Is_Far = true;
         Is_Hit = false;
 
+        Enemy_Hitbox_Transform = this.transform.Find("Hitbox_Position").GetComponent<Transform>();
+        
     }
 
     // ***************************************************************************************** \\
@@ -78,10 +86,12 @@ public class Script_BadBoi : MonoBehaviour {
 
                 CleenSpeed = CleenSpeed * -1;
                 _SpriteRenderer.flipX = false;
+                Enemy_Hitbox_Transform.position = new Vector3(this.transform.position.x - 2.45f, this.transform.position.y, 0);
 
             } else {
 
                 _SpriteRenderer.flipX = true;
+                Enemy_Hitbox_Transform.position = new Vector3(this.transform.position.x + 2.45f, this.transform.position.y, 0);
             }
 
             Vector2 _velocity = _RigideBody.velocity;
@@ -95,8 +105,15 @@ public class Script_BadBoi : MonoBehaviour {
         }
     }
 
+    // ***************************************************************************************** \\
+    // Debug
+    // ***************************************************************************************** \\
 
     private void OnDrawGizmos() {
+
+        if (Is_Alive) {
+            Gizmos.DrawWireCube(Enemy_Hitbox_Transform.position, Enemy_Hitbox_Size);
+        }
 
         if (Is_Far) {
 
@@ -144,6 +161,30 @@ public class Script_BadBoi : MonoBehaviour {
         yield return new WaitForSeconds(Stun_Time);
         Is_Hit = false;
     }
+
+    // ***************************************************************************************** \\
+    // Attack
+    // ***************************************************************************************** \\
+
+
+    public void Attack_Normal() {
+
+        Collider2D[] Enemy_Hitbox = Physics2D.OverlapBoxAll(this.transform.position, Enemy_Hitbox_Size, Enemy_Hitbox_layermask);
+
+        foreach (var Target in Enemy_Hitbox) {
+
+            if (Target.tag == "Player") {
+
+                Debug.Log(Target.name);
+
+            }
+        }
+
+
+        Debug.Log("Basic attack Is Performed");
+
+    }
+
 
     // ***************************************************************************************** \\
     // KnockBack Application

@@ -13,6 +13,7 @@ GameObject:
   - component: {fileID: 3588811540066959094}
   - component: {fileID: 3452204562924045831}
   - component: {fileID: 1683462085278614738}
+  - component: {fileID: 3640910426116979182}
   m_Layer: 6
   m_Name: Training_Dummy
   m_TagString: Enemy
@@ -32,7 +33,8 @@ Transform:
   m_LocalPosition: {x: -33.685, y: 11.497, z: 0}
   m_LocalScale: {x: 0.3807, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
-  m_Children: []
+  m_Children:
+  - {fileID: 1327457936627225940}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &8808183216926492908
@@ -50,10 +52,15 @@ MonoBehaviour:
   Life_Point: 3
   Enemeie_Type: 110
   speed: 200
+  Stun_Time: 0
+  Enemy_Hitbox_Size: {x: 0, y: 0}
+  Enemy_Hitbox_layermask: 0
+  Enemy_Hitbox_Transform: {fileID: 0}
   Light_knockback: {x: 2, y: 5}
   Heavy_knockback: {x: 4, y: 10}
   Target_Transform: {fileID: 0}
   Chase_Distance: 0
+  actual_distance: 0
   Attack_Distance: 0
   Is_Alive: 0
 --- !u!212 &3588811540066959094
@@ -99,7 +106,7 @@ SpriteRenderer:
   m_SortingOrder: 0
   m_Sprite: {fileID: 7482667652216324306, guid: 311925a002f4447b3a28927169b83ea6,
     type: 3}
-  m_Color: {r: 0.20908546, g: 1, b: 0, a: 1}
+  m_Color: {r: 0.20015311, g: 1, b: 0, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
@@ -171,3 +178,55 @@ Rigidbody2D:
   m_SleepingMode: 1
   m_CollisionDetection: 0
   m_Constraints: 4
+--- !u!95 &3640910426116979182
+Animator:
+  serializedVersion: 5
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 642199783478091081}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: d0d3c92ca3aea5f4b881f57ad6ed55f6, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0
+--- !u!1 &2636317891881551923
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1327457936627225940}
+  m_Layer: 8
+  m_Name: Hitbox_Position
+  m_TagString: Enemy
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1327457936627225940
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2636317891881551923}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 1, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 6980587229575613081}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
