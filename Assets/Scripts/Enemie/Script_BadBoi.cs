@@ -72,6 +72,9 @@ public class Script_BadBoi : MonoBehaviour {
         Is_Dead();
     }
 
+    // ***************************************************************************************** \\
+    // Behaviour
+    // ***************************************************************************************** \\
     private void Chase_Control() {
 
         Is_Chasing = Vector2.Distance(this.transform.position, Target_Transform.position) < Chase_Distance;
@@ -86,12 +89,12 @@ public class Script_BadBoi : MonoBehaviour {
 
                 CleenSpeed = CleenSpeed * -1;
                 _SpriteRenderer.flipX = false;
-                Enemy_Hitbox_Transform.position = new Vector3(this.transform.position.x - 2.45f, this.transform.position.y, 0);
+                Enemy_Hitbox_Transform.position = new Vector3(this.transform.position.x - 1f, this.transform.position.y, 0);
 
             } else {
 
                 _SpriteRenderer.flipX = true;
-                Enemy_Hitbox_Transform.position = new Vector3(this.transform.position.x + 2.45f, this.transform.position.y, 0);
+                Enemy_Hitbox_Transform.position = new Vector3(this.transform.position.x + 1f, this.transform.position.y, 0);
             }
 
             Vector2 _velocity = _RigideBody.velocity;
