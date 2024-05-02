@@ -232,6 +232,7 @@ public class Player_controle : MonoBehaviour {
 
         foreach (var Object in Ground_Detection) {
 
+            Debug.Log(Object.name);
             if (Object.tag == "World") {
 
                 Is_Grounded = true;

@@ -31,7 +31,7 @@ public class Script_BadBoi : MonoBehaviour {
     [SerializeField] private bool Is_Alive;
 
     // --- State --- \\
-    private bool Is_Far, Is_Chasing, Is_Close, Is_Hit, Is_Attack;
+    private bool Is_Far, Is_Chasing, Is_Close, Is_Hit, Is_Attack, Is_Freeze;
 
     // --- QOther --- \\
     private Rigidbody2D _RigideBody;
@@ -54,6 +54,8 @@ public class Script_BadBoi : MonoBehaviour {
         Is_Close = false;
         Is_Far = true;
         Is_Hit = false;
+        Is_Attack = false;
+        Is_Freeze = false;
 
         Enemy_Hitbox_Transform = this.transform.Find("Hitbox_Position").GetComponent<Transform>();
         
@@ -64,7 +66,7 @@ public class Script_BadBoi : MonoBehaviour {
     // ***************************************************************************************** \\
     private void Update() {
 
-        if (Is_Alive && !Is_Hit) {
+        if (Is_Alive && !Is_Hit && !Is_Freeze) {
             Chase_Control();
             actual_distance = Vector2.Distance(this.transform.position, Target_Transform.position);
         }
@@ -101,9 +103,10 @@ public class Script_BadBoi : MonoBehaviour {
             _velocity.x = CleenSpeed ;
             _RigideBody.velocity = _velocity;
 
-        } else if (Is_Close) {
+        } else if (Is_Close && !Is_Attack) {
 
-            // On attack
+            _Animator.SetTrigger("Trigger_Attack");
+            StartCoroutine(Attack_Couldown());
 
         }
     }
@@ -172,7 +175,7 @@ public class Script_BadBoi : MonoBehaviour {
 
     public void Attack_Normal() {
 
-        Collider2D[] Enemy_Hitbox = Physics2D.OverlapBoxAll(this.transform.position, Enemy_Hitbox_Size, Enemy_Hitbox_layermask);
+        Collider2D[] Enemy_Hitbox = Physics2D.OverlapBoxAll(Enemy_Hitbox_Transform.position, Enemy_Hitbox_Size, Enemy_Hitbox_layermask);
 
         foreach (var Target in Enemy_Hitbox) {
 
@@ -187,7 +190,12 @@ public class Script_BadBoi : MonoBehaviour {
         Debug.Log("Basic attack Is Performed");
 
     }
+    IEnumerator Attack_Couldown() {
 
+        Is_Attack = true;
+        yield return new WaitForSeconds(Stun_Time);
+        Is_Attack = false;
+    }
 
     // ***************************************************************************************** \\
     // KnockBack Application
@@ -219,6 +227,19 @@ public class Script_BadBoi : MonoBehaviour {
         }
 
 
+    }
+
+    // ***************************************************************************************** \\
+    // Freeze Methode
+    // ***************************************************************************************** \\
+    public void FreezOn() {
+
+        Is_Freeze = true;
+    }
+
+    public void FreezOff() {
+
+        Is_Freeze = false;
     }
 
     // ***************************************************************************************** \\
