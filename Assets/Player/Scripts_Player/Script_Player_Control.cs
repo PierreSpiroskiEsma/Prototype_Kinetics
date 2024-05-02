@@ -165,6 +165,7 @@ public class Player_controle : MonoBehaviour {
         Ground_Detection();
         Wall_Detection();
         Fall_detection();
+        Enemy_Awakening_Box();
 
         if (!Freeze) { 
 
@@ -177,8 +178,8 @@ public class Player_controle : MonoBehaviour {
         }
 
         animate_StopRun();
-    }
 
+    }
 
     // ***************************************************************************************** \\
     // Development Tool
@@ -232,7 +233,6 @@ public class Player_controle : MonoBehaviour {
 
         foreach (var Object in Ground_Detection) {
 
-            Debug.Log(Object.name);
             if (Object.tag == "World") {
 
                 Is_Grounded = true;
@@ -259,6 +259,7 @@ public class Player_controle : MonoBehaviour {
 
     // --- FALL --- \\
     private void Fall_detection() {
+
         if (Is_Grounded) {
 
             animate_jump(false);
@@ -269,10 +270,27 @@ public class Player_controle : MonoBehaviour {
         }
     }
 
+    // --- Enemy --- \\
+    private void Enemy_Awakening_Box() {
+
+        Collider2D[] Enemey_found = Physics2D.OverlapBoxAll(this.transform.position, new Vector2(10,10), Player_Hitbox_LayerMask);
+
+        foreach (var Object in Enemey_found) {
+
+            if (Object.tag == "Enemy") {
+
+                if (Object.GetComponent<Script_BadBoi>().Get_Alive()) {
+
+                    Object.GetComponent<Script_BadBoi>().assign_Player(this.transform);
+                }
+            }            
+        }
+    }
+
     // --- ESSENCE SOURCE --- \\
 
 
- 
+
 
     // ***************************************************************************************** \\
     // Cinematic setting

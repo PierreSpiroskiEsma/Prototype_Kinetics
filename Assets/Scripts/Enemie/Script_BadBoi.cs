@@ -67,11 +67,29 @@ public class Script_BadBoi : MonoBehaviour {
     private void Update() {
 
         if (Is_Alive && !Is_Hit && !Is_Freeze) {
-            Chase_Control();
-            actual_distance = Vector2.Distance(this.transform.position, Target_Transform.position);
+
+            if (Target_Transform != null) {
+
+                Chase_Control();
+            }
+            
         }
         
         Is_Dead();
+    }
+
+    // ***************************************************************************************** \\
+    // Assign player
+    // ***************************************************************************************** \\
+
+
+    public bool Get_Alive() {
+
+        return Is_Alive;
+    }
+    public void assign_Player(Transform _player) {
+
+        Target_Transform = _player.transform;
     }
 
     // ***************************************************************************************** \\
