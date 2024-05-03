@@ -273,7 +273,7 @@ public class Player_controle : MonoBehaviour {
     // --- Enemy --- \\
     private void Enemy_Awakening_Box() {
 
-        Collider2D[] Enemey_found = Physics2D.OverlapBoxAll(this.transform.position, new Vector2(10,10), Player_Hitbox_LayerMask);
+        Collider2D[] Enemey_found = Physics2D.OverlapBoxAll(this.transform.position, new Vector2(15,5), Player_Hitbox_LayerMask);
 
         foreach (var Object in Enemey_found) {
 

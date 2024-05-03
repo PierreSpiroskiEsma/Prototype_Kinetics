@@ -8,7 +8,9 @@ public class Script_BadBoi : MonoBehaviour {
     [SerializeField] private int Life_Point;
     [SerializeField] private char Enemeie_Type;
     [SerializeField] private float speed;
+    [SerializeField] private float jump;
     [SerializeField] private float Stun_Time;
+    [SerializeField] private int Enemy_Jump_layermask;
 
     [Header("Attack Stetting")]
     [SerializeField] private Vector2 Enemy_Hitbox_Size;
@@ -37,6 +39,7 @@ public class Script_BadBoi : MonoBehaviour {
     private Rigidbody2D _RigideBody;
     private SpriteRenderer _SpriteRenderer;
     private Animator _Animator;
+    private bool jump_coldown;
 
 
 
@@ -56,6 +59,7 @@ public class Script_BadBoi : MonoBehaviour {
         Is_Hit = false;
         Is_Attack = false;
         Is_Freeze = false;
+        jump_coldown = false;
 
         Enemy_Hitbox_Transform = this.transform.Find("Hitbox_Position").GetComponent<Transform>();
         
@@ -110,6 +114,7 @@ public class Script_BadBoi : MonoBehaviour {
                 CleenSpeed = CleenSpeed * -1;
                 _SpriteRenderer.flipX = false;
                 Enemy_Hitbox_Transform.position = new Vector3(this.transform.position.x - 1f, this.transform.position.y, 0);
+               
 
             } else {
 
@@ -117,6 +122,7 @@ public class Script_BadBoi : MonoBehaviour {
                 Enemy_Hitbox_Transform.position = new Vector3(this.transform.position.x + 1f, this.transform.position.y, 0);
             }
 
+            Spring_random();
             Vector2 _velocity = _RigideBody.velocity;
             _velocity.x = CleenSpeed ;
             _RigideBody.velocity = _velocity;
@@ -127,6 +133,20 @@ public class Script_BadBoi : MonoBehaviour {
             StartCoroutine(Attack_Couldown());
 
         }
+    }
+
+    private void Spring_random() {
+
+        if (!jump_coldown) {
+
+            if ((Random.Range(0, 10) == 1)) {
+
+                _RigideBody.AddForce(new Vector2(0f, jump), ForceMode2D.Impulse);
+                StartCoroutine(Couldown());
+
+            }
+        }
+
     }
 
     // ***************************************************************************************** \\
@@ -270,6 +290,14 @@ public class Script_BadBoi : MonoBehaviour {
             Destroy(gameObject, 0.5f);
         }
 
+    }
+
+    IEnumerator Couldown()
+    {
+
+        jump_coldown = true;
+        yield return new WaitForSeconds(0.5f);
+        jump_coldown = false;
     }
 
 
