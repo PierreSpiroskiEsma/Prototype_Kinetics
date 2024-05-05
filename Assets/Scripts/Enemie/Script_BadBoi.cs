@@ -9,8 +9,11 @@ public class Script_BadBoi : MonoBehaviour {
     [SerializeField] private char Enemeie_Type;
     [SerializeField] private float speed;
     [SerializeField] private float jump;
+
+    [Header("Coldown")]
     [SerializeField] private float Stun_Time;
-    [SerializeField] private int Enemy_Jump_layermask;
+    [SerializeField] private float Attack_Time;
+    [SerializeField] private float Decision_Time;
 
     [Header("Attack Stetting")]
     [SerializeField] private Vector2 Enemy_Hitbox_Size;
@@ -34,12 +37,14 @@ public class Script_BadBoi : MonoBehaviour {
 
     // --- State --- \\
     private bool Is_Far, Is_Chasing, Is_Close, Is_Hit, Is_Attack, Is_Freeze;
+    private bool Can_jump, Can_think;
 
     // --- QOther --- \\
     private Rigidbody2D _RigideBody;
     private SpriteRenderer _SpriteRenderer;
     private Animator _Animator;
-    private bool jump_coldown;
+
+    public bool Is_On_Left { get; private set; }
 
 
 
@@ -59,10 +64,29 @@ public class Script_BadBoi : MonoBehaviour {
         Is_Hit = false;
         Is_Attack = false;
         Is_Freeze = false;
-        jump_coldown = false;
+        Can_jump = false;
+        Can_think = true;
 
         Enemy_Hitbox_Transform = this.transform.Find("Hitbox_Position").GetComponent<Transform>();
         
+    }
+
+    private void Start() {
+        
+        switch (Random.Range(0, 3)) {
+
+            case 0:
+                speed = speed + 10;
+            break;
+
+            case 1:
+                
+            break;
+
+            case 2:
+                speed = speed - 10;
+            break;
+        }
     }
 
     // ***************************************************************************************** \\
@@ -74,6 +98,7 @@ public class Script_BadBoi : MonoBehaviour {
 
             if (Target_Transform != null) {
 
+                Position_Control();
                 Chase_Control();
             }
             
@@ -109,20 +134,20 @@ public class Script_BadBoi : MonoBehaviour {
 
         if (Is_Chasing && !Is_Close) {
 
-            if( this.transform.position.x > Target_Transform.position.x ) {
+            if(Is_On_Left) {
 
                 CleenSpeed = CleenSpeed * -1;
-                _SpriteRenderer.flipX = false;
+                _SpriteRenderer.flipX = true;
                 Enemy_Hitbox_Transform.position = new Vector3(this.transform.position.x - 1f, this.transform.position.y, 0);
                
 
             } else {
 
-                _SpriteRenderer.flipX = true;
+                _SpriteRenderer.flipX = false;
                 Enemy_Hitbox_Transform.position = new Vector3(this.transform.position.x + 1f, this.transform.position.y, 0);
             }
 
-            Spring_random();
+            Go_Jump();
             Vector2 _velocity = _RigideBody.velocity;
             _velocity.x = CleenSpeed ;
             _RigideBody.velocity = _velocity;
@@ -130,23 +155,21 @@ public class Script_BadBoi : MonoBehaviour {
         } else if (Is_Close && !Is_Attack) {
 
             _Animator.SetTrigger("Trigger_Attack");
+            _RigideBody.velocity = new Vector2 (0,0);
             StartCoroutine(Attack_Couldown());
 
         }
     }
 
-    private void Spring_random() {
+    private void Position_Control() {
 
-        if (!jump_coldown) {
+        if (Can_think) {
 
-            if ((Random.Range(0, 10) == 1)) {
+            Is_On_Left = this.transform.position.x > Target_Transform.position.x;
+            StartCoroutine(Thinking_Time());
 
-                _RigideBody.AddForce(new Vector2(0f, jump), ForceMode2D.Impulse);
-                StartCoroutine(Couldown());
-
-            }
         }
-
+        
     }
 
     // ***************************************************************************************** \\
@@ -199,19 +222,14 @@ public class Script_BadBoi : MonoBehaviour {
         }
     }
 
-    IEnumerator Stunlock() {
 
-        Is_Hit = true;
-        yield return new WaitForSeconds(Stun_Time);
-        Is_Hit = false;
-    }
 
     // ***************************************************************************************** \\
-    // Attack
+    // Action
     // ***************************************************************************************** \\
 
 
-    public void Attack_Normal() {
+    public void Go_Attack() {
 
         Collider2D[] Enemy_Hitbox = Physics2D.OverlapBoxAll(Enemy_Hitbox_Transform.position, Enemy_Hitbox_Size, Enemy_Hitbox_layermask);
 
@@ -228,12 +246,21 @@ public class Script_BadBoi : MonoBehaviour {
         Debug.Log("Basic attack Is Performed");
 
     }
-    IEnumerator Attack_Couldown() {
 
-        Is_Attack = true;
-        yield return new WaitForSeconds(Stun_Time);
-        Is_Attack = false;
+    private void Go_Jump() {
+
+        if (!Can_jump) {
+
+            if ((Random.Range(0, 5) == 1)) {
+
+                _RigideBody.AddForce(new Vector2(0f, jump), ForceMode2D.Impulse);
+            }
+
+            StartCoroutine(Jump_Couldown());
+        }
+
     }
+
 
     // ***************************************************************************************** \\
     // KnockBack Application
@@ -289,17 +316,42 @@ public class Script_BadBoi : MonoBehaviour {
 
             Destroy(gameObject, 0.5f);
         }
-
     }
 
-    IEnumerator Couldown()
-    {
+    // ***************************************************************************************** \\
+    // Coroutine
+    // ***************************************************************************************** \\
 
-        jump_coldown = true;
-        yield return new WaitForSeconds(0.5f);
-        jump_coldown = false;
+
+    IEnumerator Stunlock() {
+
+        Is_Hit = true;
+        yield return new WaitForSeconds(Stun_Time);
+        Is_Hit = false;
     }
 
+    IEnumerator Attack_Couldown() {
+
+        Is_Attack = true;
+        yield return new WaitForSeconds(Attack_Time);
+        Is_Attack = false;
+    }
+
+    IEnumerator Jump_Couldown() {
+
+        Can_jump = true;
+        yield return new WaitForSeconds(0.25f);
+        Can_jump = false;
+    }
+
+    IEnumerator Thinking_Time() {
+
+        Can_think = false;
+
+        yield return new WaitForSeconds(Decision_Time);
+
+        Can_think = true;
+    }
 
 
 }

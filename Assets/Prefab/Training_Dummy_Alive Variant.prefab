@@ -61,22 +61,27 @@ PrefabInstance:
     - target: {fileID: 3452204562924045831, guid: 27e48c2d5cf6c524c841cef9ab85487b,
         type: 3}
       propertyPath: m_Size.x
-      value: 0.25505733
+      value: 0.34431458
       objectReference: {fileID: 0}
     - target: {fileID: 3452204562924045831, guid: 27e48c2d5cf6c524c841cef9ab85487b,
         type: 3}
       propertyPath: m_Size.y
-      value: 0.530962
+      value: 0.50299406
       objectReference: {fileID: 0}
     - target: {fileID: 3452204562924045831, guid: 27e48c2d5cf6c524c841cef9ab85487b,
         type: 3}
+      propertyPath: m_Material
+      value: 
+      objectReference: {fileID: 6200000, guid: f745dca3bfcd7a542a53e1e2d75718da, type: 2}
+    - target: {fileID: 3452204562924045831, guid: 27e48c2d5cf6c524c841cef9ab85487b,
+        type: 3}
       propertyPath: m_Offset.x
-      value: -0.07817316
+      value: -0.068964005
       objectReference: {fileID: 0}
     - target: {fileID: 3452204562924045831, guid: 27e48c2d5cf6c524c841cef9ab85487b,
         type: 3}
       propertyPath: m_Offset.y
-      value: -0.0827713
+      value: -0.07975507
       objectReference: {fileID: 0}
     - target: {fileID: 3588811540066959094, guid: 27e48c2d5cf6c524c841cef9ab85487b,
         type: 3}
@@ -147,7 +152,7 @@ PrefabInstance:
     - target: {fileID: 8808183216926492908, guid: 27e48c2d5cf6c524c841cef9ab85487b,
         type: 3}
       propertyPath: speed
-      value: 400
+      value: 280
       objectReference: {fileID: 0}
     - target: {fileID: 8808183216926492908, guid: 27e48c2d5cf6c524c841cef9ab85487b,
         type: 3}
@@ -158,6 +163,16 @@ PrefabInstance:
         type: 3}
       propertyPath: Stun_Time
       value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 8808183216926492908, guid: 27e48c2d5cf6c524c841cef9ab85487b,
+        type: 3}
+      propertyPath: Attack_Time
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 8808183216926492908, guid: 27e48c2d5cf6c524c841cef9ab85487b,
+        type: 3}
+      propertyPath: Decision_Time
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 8808183216926492908, guid: 27e48c2d5cf6c524c841cef9ab85487b,
         type: 3}
