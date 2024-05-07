@@ -134,7 +134,7 @@ public class Script_BadBoi : MonoBehaviour {
 
         if (Is_Chasing && !Is_Close) {
 
-            if(Is_On_Left) {
+            if (Is_On_Left) {
 
                 CleenSpeed = CleenSpeed * -1;
                 _SpriteRenderer.flipX = true;
