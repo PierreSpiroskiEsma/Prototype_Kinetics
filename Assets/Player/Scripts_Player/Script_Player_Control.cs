@@ -283,7 +283,15 @@ public class Player_controle : MonoBehaviour {
 
                     Object.GetComponent<Script_BadBoi>().assign_Player(this.transform);
                 }
-            }            
+            } 
+            
+            if (Object.tag == "Prefab_ia") {
+
+                if (Object.GetComponent<Script_PatrolingAi_Prefab>().Get_Alive()) {
+
+                    Object.GetComponent<Script_PatrolingAi_Prefab>().Assign_Player(this.transform);
+                }
+            }
         }
     }
 

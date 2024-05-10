@@ -10,6 +10,7 @@ TagManager:
   - Essence Source
   - Destructible
   - Patrol
+  - Prefab_ia
   layers:
   - Default
   - TransparentFX
