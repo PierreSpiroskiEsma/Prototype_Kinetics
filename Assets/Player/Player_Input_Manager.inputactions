@@ -270,6 +270,17 @@
                 },
                 {
                     "name": "",
+                    "id": "7bb1c5a8-8b47-4b27-9279-bb277dd72a5e",
+                    "path": "<XInputController>/leftTrigger",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Essence",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
                     "id": "43dc3aa5-1a46-4fe9-9ebb-edbf7411e580",
                     "path": "<Gamepad>/rightTrigger",
                     "interactions": "",
@@ -286,6 +297,17 @@
                     "interactions": "",
                     "processors": "",
                     "groups": "Keyboard&Mouse",
+                    "action": "Interact",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "8b155b7f-2e55-4ed6-9bf5-eecd1c598142",
+                    "path": "<XInputController>/rightTrigger",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
                     "action": "Interact",
                     "isComposite": false,
                     "isPartOfComposite": false
