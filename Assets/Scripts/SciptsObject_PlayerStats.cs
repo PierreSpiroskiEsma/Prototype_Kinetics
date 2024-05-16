@@ -46,4 +46,8 @@ public class SciptsObject_PlayerStats : ScriptableObject
     [SerializeField] float PlayerStatistics_Walljump_duration = 10f;
     public float Get_PlayerStatistics_Walljump_duration() { return PlayerStatistics_Walljump_duration; }
     public void Set_PlayerStatistics_Walljump_duration(float duration) { PlayerStatistics_Walljump_duration = duration; }
+
+    [SerializeField] float PlayerStatistics_Coyote_time = 0.2f;
+    public float Get_PlayerStatistics_Coyote_time() { return PlayerStatistics_Coyote_time; }
+    public void Set_PlayerStatistics_Coyote_time(float duration) { PlayerStatistics_Coyote_time = duration; }
 }

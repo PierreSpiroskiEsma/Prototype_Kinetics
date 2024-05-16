@@ -17,6 +17,7 @@ public class Player_controle : MonoBehaviour {
     [SerializeField] Transform Ground_Check_Position;
     [SerializeField] float Ground_Check_Radius;
     [SerializeField] LayerMask Ground_Check_Layer;
+    private float Coyote_Counter;
 
     //WallJump Overlap
     [Header("WallJump")]
@@ -47,7 +48,7 @@ public class Player_controle : MonoBehaviour {
     bool Can_WallJump, Can_Dash, Can_Charge;
 
     //State check
-    bool Is_Grounded, Is_Wall , Is_Essence_Active, Is_Attack_Default, Is_Front, Is_Charge;
+    bool Is_Grounded, Is_Wall , Is_Essence_Active, Is_Attack_Default, Is_Front, Is_Charge, Is_Dash;
 
     //Essence System
     [SerializeField] int[] Essence_Inventory = new int[3];
@@ -322,12 +323,13 @@ public class Player_controle : MonoBehaviour {
     // --- JUMP --- \\
     private void OnJump(InputAction.CallbackContext context) {
 
-        if (Is_Essence_Active && Is_Grounded) {
+        if (Is_Essence_Active) {
 
             Essence_Use(4);
 
-        } else if (Is_Grounded || (Is_Wall && Can_WallJump)) {
+        } else if (Is_Grounded || (Is_Wall && Can_WallJump) || (Coyote_Counter > 0 && _rigidbody.velocity.y < 0.05f)) {
 
+            Can_Dash = true;
             _rigidbody.velocity = new Vector2(_rigidbody.velocity.x, Stats.Get_PlayerStatistics_Jump_Speed());
         }
 
@@ -339,6 +341,11 @@ public class Player_controle : MonoBehaviour {
         if (_rigidbody.velocity.y > 0) {
 
             _rigidbody.velocity = new Vector2(_rigidbody.velocity.x, _rigidbody.velocity.y * 0.5f);
+        }
+
+        if (_rigidbody.velocity.y < 0) {
+
+            _rigidbody.velocity = new Vector2(_rigidbody.velocity.x, _rigidbody.velocity.y * 2f);
         }
     }
 
@@ -394,10 +401,16 @@ public class Player_controle : MonoBehaviour {
         Input_Direction = _moveAction.ReadValue<Vector2>();
         Vector2 Player_Velocity = _rigidbody.velocity;
 
+
+        if (Is_Dash) {
+
+            Player_Velocity.y = 0;
+        }
+
         Player_Velocity.x = (Stats.Get_Player_Speed() * Input_Direction.x) ;
         _rigidbody.velocity = Player_Velocity;
 
-        if( _rigidbody.velocity.x > 0.01) {
+        if (_rigidbody.velocity.x > 0.01) {
 
             Is_Front = true;
         
@@ -405,6 +418,17 @@ public class Player_controle : MonoBehaviour {
 
             Is_Front = false;
         }
+
+        if (Is_Grounded) {
+
+            Coyote_Counter = Stats.Get_PlayerStatistics_Coyote_time();
+
+        } else {
+            
+            Coyote_Counter -= Time.deltaTime;
+
+        }
+
     }
 
     // --- DASH --- \\
@@ -877,9 +901,14 @@ public class Player_controle : MonoBehaviour {
 
         Stats.Set_Player_Speed(Stats.Get_PlayerStatistics_Speed() * Stats.Get_PlayerStatistics_Dash_Speed());
 
+        Is_Dash = true;
+        Can_Dash = false;
+
         //couldown
         yield return new WaitForSeconds(Stats.Get_PlayerStatistics_Dash_Duration());
 
+        Is_Dash = false;
+        
         Speed_Reset();
         Essence_light_off();
 

@@ -17,6 +17,7 @@ MonoBehaviour:
   PlayerStatistics_Jump_Speed: 11
   PlayerStatistics_Dash_Speed: 4
   PlayerStatistics_Dash_Duration: 0.1
-  PlayerStatistics_Dash_Couldown: 10
+  PlayerStatistics_Dash_Couldown: 1.5
   PlayerStatistics_Essence_Slot: 2
   PlayerStatistics_Walljump_duration: 10
+  PlayerStatistics_Coyote_time: 0.1
