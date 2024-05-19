@@ -342,16 +342,6 @@ public class Player_controle : MonoBehaviour {
 
             _rigidbody.velocity = new Vector2(_rigidbody.velocity.x, _rigidbody.velocity.y * 0.5f);
         }
-
-        if (_rigidbody.velocity.y < 0) {
-
-            _rigidbody.velocity = new Vector2(_rigidbody.velocity.x, _rigidbody.velocity.y * 1.5f);
-
-            if (_rigidbody.velocity.y < -15f)
-            {
-                _rigidbody.velocity = new Vector2(_rigidbody.velocity.x, -15f);
-            }
-        }
     }
 
     // --- ATTACK --- \\
@@ -432,6 +422,17 @@ public class Player_controle : MonoBehaviour {
             
             Coyote_Counter -= Time.deltaTime;
 
+        }
+
+
+        if (_rigidbody.velocity.y < 0) {
+
+            //_rigidbody.velocity = new Vector2(_rigidbody.velocity.x, _rigidbody.velocity.y * 1.2f);
+
+            if (_rigidbody.velocity.y < -15f) {
+
+                _rigidbody.velocity = new Vector2(_rigidbody.velocity.x, -15f);
+            }
         }
 
     }
