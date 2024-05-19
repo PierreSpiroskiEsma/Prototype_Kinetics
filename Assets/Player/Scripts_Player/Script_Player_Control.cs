@@ -345,7 +345,12 @@ public class Player_controle : MonoBehaviour {
 
         if (_rigidbody.velocity.y < 0) {
 
-            _rigidbody.velocity = new Vector2(_rigidbody.velocity.x, _rigidbody.velocity.y * 2f);
+            _rigidbody.velocity = new Vector2(_rigidbody.velocity.x, _rigidbody.velocity.y * 1.5f);
+
+            if (_rigidbody.velocity.y < -15f)
+            {
+                _rigidbody.velocity = new Vector2(_rigidbody.velocity.x, -15f);
+            }
         }
     }
 
@@ -433,7 +438,9 @@ public class Player_controle : MonoBehaviour {
 
     // --- DASH --- \\
     private void OnDash(InputAction.CallbackContext context) {
-        if (Can_Dash) {
+
+        if (Can_Dash || Is_Essence_Active) {
+
             if (Is_Essence_Active) {
 
                 Essence_Use(3);
@@ -760,6 +767,7 @@ public class Player_controle : MonoBehaviour {
 
                         case 2:
 
+                            StopCoroutine(Fonction_Walljump());
                             StartCoroutine(Fonction_Walljump());
 
                         break;
@@ -913,6 +921,7 @@ public class Player_controle : MonoBehaviour {
         Essence_light_off();
 
         yield return new WaitForSeconds(Stats.Get_PlayerStatistics_Dash_Couldown());
+
         Can_Dash = true;
     }
 
@@ -922,13 +931,19 @@ public class Player_controle : MonoBehaviour {
 
         Stats.Set_Player_Speed(Stats.Get_PlayerStatistics_Speed() * (Stats.Get_PlayerStatistics_Dash_Speed() * 2));
 
+        Is_Dash = true;
+        Can_Dash = false;
+
         //couldown
         yield return new WaitForSeconds(Stats.Get_PlayerStatistics_Dash_Duration());
+
+        Is_Dash = false;
 
         Speed_Reset();
         Essence_light_off();
 
         yield return new WaitForSeconds(Stats.Get_PlayerStatistics_Dash_Couldown());
+
         Can_Dash = true;
     }
 
