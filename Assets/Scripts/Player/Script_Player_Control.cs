@@ -43,6 +43,7 @@ public class Player_controle : MonoBehaviour {
     //the Statistic sheets of the player
     [Header("Player Statistics Sheets")]
     [SerializeField] SciptsObject_PlayerStats Stats;
+    [SerializeField] Canvas _Canvas;
 
     //Ability Check
     bool Can_WallJump, Can_Dash, Can_Charge;
@@ -179,6 +180,8 @@ public class Player_controle : MonoBehaviour {
         }
 
         animate_StopRun();
+
+        _Canvas.GetComponent<Script_Ui>().Power_Display(Essence_Inventory);
 
     }
 
