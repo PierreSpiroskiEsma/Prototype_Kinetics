@@ -8,7 +8,8 @@ public class Script_Ui : MonoBehaviour {
     private Canvas _Canvas;
     private RawImage Powerslot_1_Red, Powerslot_1_Blue, Powerslot_1_Yew,
         Powerslot_2_Red, Powerslot_2_Blue, Powerslot_2_Yew,
-        Powerslot_3_Red, Powerslot_3_Blue, Powerslot_3_Yew;
+        Powerslot_3_Red, Powerslot_3_Blue, Powerslot_3_Yew,
+        Power_barr;
 
 
     private void Start() {
@@ -25,6 +26,8 @@ public class Script_Ui : MonoBehaviour {
         Powerslot_3_Red = this.transform.Find("PowerSlot_Blue3").GetComponent<RawImage>();
         Powerslot_3_Blue = this.transform.Find("PowerSlot_Red3").GetComponent<RawImage>();
         Powerslot_3_Yew = this.transform.Find("PowerSlot_Yew3").GetComponent<RawImage>();
+
+        Power_barr = this.transform.Find("PowerBarre_Default").GetComponent<RawImage>();
     }
 
     public void Power_Display(int[] Power_storage) {
@@ -36,7 +39,7 @@ public class Script_Ui : MonoBehaviour {
         switch (Power_storage[0]) {
             case 2:
                 Powerslot_1_Red.color = Color.white;
-            break;
+                break;
 
             case 1:
                 Powerslot_1_Blue.color = Color.white;
@@ -55,15 +58,15 @@ public class Script_Ui : MonoBehaviour {
 
             case 2:
                 Powerslot_2_Red.color = Color.white;
-            break;
+                break;
 
             case 1:
                 Powerslot_2_Blue.color = Color.white;
-            break;
+                break;
 
             case 3:
                 Powerslot_2_Yew.color = Color.white;
-            break;
+                break;
         }
 
         Powerslot_3_Red.color = Color.clear;
@@ -74,15 +77,54 @@ public class Script_Ui : MonoBehaviour {
 
             case 2:
                 Powerslot_3_Red.color = Color.white;
-            break;
+                break;
 
             case 1:
                 Powerslot_3_Blue.color = Color.white;
-            break;
+                break;
 
             case 3:
                 Powerslot_3_Yew.color = Color.white;
-            break;
+                break;
+        }
+
+
+
+    }
+
+    public void BarrDisplay(int[] Power_storage)
+    {
+        int BarrDisplay = 0;
+
+        for (int i = 0; i < 2; i++)
+        {
+            if (Power_storage[i] != 0)
+            {
+                BarrDisplay = Power_storage[i];
+            }
+        }
+
+        switch (BarrDisplay)
+        {
+            case 0:
+                Power_barr.color = Color.white;
+                break;
+            case 1:
+                Power_barr.color = Color.red;
+                break;
+            case 2:
+                Power_barr.color = Color.blue;
+                break;
+            case 3:
+                Power_barr.color = Color.yellow;
+                break;
         }
     }
+
+    public void ClearDisplay()
+    {
+        Power_barr.color = Color.white;
+    }
+        
+    
 }

@@ -183,6 +183,15 @@ public class Player_controle : MonoBehaviour {
 
         _Canvas.GetComponent<Script_Ui>().Power_Display(Essence_Inventory);
 
+        if (Is_Essence_Active)
+        {
+            _Canvas.GetComponent<Script_Ui>().BarrDisplay(Essence_Inventory);
+        } else
+        {
+            _Canvas.GetComponent<Script_Ui>().ClearDisplay();
+        }
+
+
     }
 
     // ***************************************************************************************** \\
