@@ -13,14 +13,18 @@ public class script_EssenceDispencer_Power : MonoBehaviour
     enum Essence { Power, Speed, Range }
     [SerializeField] Essence _Essence = new Essence();
 
-    private Light2D obj_light;
+    private Light2D obj_light, obj_light2, obj_light3, obj_light4, obj_light5;
     private bool isActive;
     private int Essence_Type;
 
 
     private void Awake() {
 
-        obj_light = this.GetComponentInChildren<Light2D>();
+        obj_light = this.transform.Find("PowerEssence_Light").GetComponent<Light2D>();
+        obj_light2 = this.transform.Find("PowerEssence_Light2").GetComponent<Light2D>();
+        obj_light3 = this.transform.Find("PowerEssence_Light3").GetComponent<Light2D>();
+        obj_light4 = this.transform.Find("PowerEssence_Light4").GetComponent<Light2D>();
+        obj_light5 = this.transform.Find("PowerEssence_Light5").GetComponent<Light2D>();
 
         isActive = true;
 
@@ -30,22 +34,34 @@ public class script_EssenceDispencer_Power : MonoBehaviour
                 
                 Essence_Type = 1;
                 obj_light.color = new Color(1f, 0f, 0f);
+                obj_light2.color = new Color(1f, 0f, 0f);
+                obj_light3.color = new Color(1f, 0f, 0f);
+                obj_light4.color = new Color(1f, 0f, 0f);
+                obj_light5.color = new Color(1f, 0f, 0f);
 
-            break;
+                break;
 
             case Essence.Speed:
                 
                 Essence_Type = 2;
                 obj_light.color = new Color(0.19f, 0.92f, 0.82f);
+                obj_light2.color = new Color(0.19f, 0.92f, 0.82f);
+                obj_light3.color = new Color(0.19f, 0.92f, 0.82f);
+                obj_light4.color = new Color(0.19f, 0.92f, 0.82f);
+                obj_light5.color = new Color(0.19f, 0.92f, 0.82f);
 
-            break; 
+                break; 
 
             case Essence.Range:
                 
                 Essence_Type = 3;
                 obj_light.color = new Color(0.92f, 0.78f, 0.19f);
+                obj_light2.color = new Color(0.92f, 0.78f, 0.19f);
+                obj_light3.color = new Color(0.92f, 0.78f, 0.19f);
+                obj_light4.color = new Color(0.92f, 0.78f, 0.19f);
+                obj_light5.color = new Color(0.92f, 0.78f, 0.19f);
 
-            break;
+                break;
         }
     }
 
@@ -53,11 +69,20 @@ public class script_EssenceDispencer_Power : MonoBehaviour
 
         if (isActive) {
 
-            obj_light.intensity = 2f;
+            obj_light.intensity = 6f;
+            obj_light2.intensity = 6f;
+            obj_light3.intensity = 6f;
+            obj_light4.intensity = 6f;
+            obj_light5.intensity = 6f;
 
-        } else {
+        }
+        else {
 
             obj_light.intensity = 0f;
+            obj_light2.intensity = 0f;
+            obj_light3.intensity = 0f;
+            obj_light4.intensity = 0f;
+            obj_light5.intensity = 0f;
         }
 
     }
