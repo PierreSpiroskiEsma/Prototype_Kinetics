@@ -44,6 +44,7 @@ public class Player_controle : MonoBehaviour {
     [Header("Player Statistics Sheets")]
     [SerializeField] SciptsObject_PlayerStats Stats;
     [SerializeField] Canvas _Canvas;
+    [SerializeField] Transform Pause_Manager;
 
     //Ability Check
     bool Can_WallJump, Can_Dash, Can_Charge;
@@ -57,7 +58,7 @@ public class Player_controle : MonoBehaviour {
 
     //Input Manager
     private Player_Input_Manager _inputManager;
-    private InputAction _moveAction, _attackAction, _blockAction, _dashAction, _essenceAction, _interactAction, _jumpAction;
+    private InputAction _moveAction, _attackAction, _blockAction, _dashAction, _essenceAction, _interactAction, _jumpAction, _pauseAction;
 
     //Particle Call
     private Script_Essence_Praticle_Rotation ParticleBox;
@@ -81,6 +82,7 @@ public class Player_controle : MonoBehaviour {
         _essenceAction = _inputManager.Player.Essence;
         _interactAction = _inputManager.Player.Interact;
         _jumpAction = _inputManager.Player.Jump;
+        _pauseAction = _inputManager.Player.Pause;
 
     }
 
@@ -115,6 +117,7 @@ public class Player_controle : MonoBehaviour {
         _essenceAction.Enable();
         _interactAction.Enable();
         _jumpAction.Enable();
+        _pauseAction.Enabled();
 
         _jumpAction.performed += OnJump;
         _jumpAction.canceled += OffJump;
@@ -124,6 +127,7 @@ public class Player_controle : MonoBehaviour {
         _moveAction.performed += OnMouve;
         _dashAction.performed += OnDash;
         _interactAction.performed += OnInteract;
+        _pauseAction.performed += OnPause;
     }
 
     private void OnDisable() {
@@ -484,6 +488,12 @@ public class Player_controle : MonoBehaviour {
                 }
             }
         }
+    }
+
+    // --- PAUSE --- \\
+    private void OnPause(InputAction.CallbackContext context)
+    {
+        Pause_Manager.GetComponent<Script_MainMenu>().Pause_Game();
     }
 
 
