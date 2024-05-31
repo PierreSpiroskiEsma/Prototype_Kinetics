@@ -12,6 +12,9 @@ EditorBuildSettings:
     path: Assets/Scenes/Gym.unity
     guid: 9ca711b7c0b3b4440adf75d9c7a20f05
   - enabled: 1
+    path: Assets/Scenes/Scn_Menu.unity
+    guid: d8dd6ddc393682542a0ab3bf684dd0c6
+  - enabled: 1
     path: Assets/Scenes/Scn_Main.unity
     guid: 2ab432a882931574f8b5c2558971bcfe
   m_configObjects: {}

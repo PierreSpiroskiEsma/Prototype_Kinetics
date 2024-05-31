@@ -120,7 +120,7 @@ public class Player_controle : MonoBehaviour {
         _essenceAction.Enable();
         _interactAction.Enable();
         _jumpAction.Enable();
-        //_pauseAction.Enabled();
+        _pauseAction.Enable();
 
         _jumpAction.performed += OnJump;
         _jumpAction.canceled += OffJump;
@@ -585,7 +585,7 @@ public class Player_controle : MonoBehaviour {
             Action_Transform.transform.rotation = Quaternion.Euler(0f, 0f, 0f);
             Wall_Transform.rotation = Quaternion.Euler(0f, 0f, 0f);
 
-            //_Animator.SetBool("B_Anim_Run", true);
+            _Animator.SetBool("Bool_Run", true);
 
             _SpriteRenderer.flipX = false;
 
@@ -596,13 +596,13 @@ public class Player_controle : MonoBehaviour {
             Action_Transform.transform.rotation = Quaternion.Euler(0f, 180f, 0f);
             Wall_Transform.rotation = Quaternion.Euler(0f, 180f, 0f);
 
-            //_Animator.SetBool("B_Anim_Run", true);
+            _Animator.SetBool("Bool_Run", true);
 
             _SpriteRenderer.flipX = true;
 
         } else {
 
-            //_Animator.SetBool("B_Anim_Run", false);
+            _Animator.SetBool("Bool_Run", false);
 
         }
 
@@ -611,7 +611,7 @@ public class Player_controle : MonoBehaviour {
     void animate_StopRun() {
 
         if (_rigidbody.velocity.x == 0) {
-            //_Animator.SetBool("B_Anim_Run", false);
+            _Animator.SetBool("Bool_Run", false);
         }
 
     }
@@ -642,7 +642,7 @@ public class Player_controle : MonoBehaviour {
     void animate_jump(bool set) {
 
         //animation
-        _Animator.SetBool("B_Anim_Jump", set);
+        _Animator.SetBool("Bool_Jump", set);
 
     }
 

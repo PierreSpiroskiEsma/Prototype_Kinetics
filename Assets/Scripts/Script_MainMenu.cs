@@ -54,6 +54,6 @@ public class Script_MainMenu : MonoBehaviour
 
         Time.timeScale = 1f;
 
-        SceneManager.LoadScene("Scn_Menue");
+        SceneManager.LoadScene("Scn_Menu");
     }
 }
