@@ -11,6 +11,7 @@ TagManager:
   - Destructible
   - Patrol
   - Prefab_ia
+  - Collectible
   layers:
   - Default
   - TransparentFX
@@ -21,7 +22,7 @@ TagManager:
   - Enemie HurtBox
   - Player Hitbox
   - Enemie Hitbox
-  - 
+  - Collectible
   - 
   - 
   - 

@@ -51,6 +51,7 @@ public class Player_controle : MonoBehaviour {
 
     //State check
     bool Is_Grounded, Is_Wall , Is_Essence_Active, Is_Attack_Default, Is_Front, Is_Charge, Is_Dash;
+    int powerlevel;
 
     //Essence System
     [SerializeField] int[] Essence_Inventory = new int[3];
@@ -76,7 +77,7 @@ public class Player_controle : MonoBehaviour {
         _inputManager = new Player_Input_Manager();
 
         _moveAction = _inputManager.Player.Move;
-        _attackAction = _inputManager.Player.Attack;
+        //_attackAction = _inputManager.Player.Attack;
         _blockAction = _inputManager.Player.Block;
         _dashAction = _inputManager.Player.Dash;
         _essenceAction = _inputManager.Player.Essence;
@@ -110,18 +111,20 @@ public class Player_controle : MonoBehaviour {
         Can_Charge = false;
         Is_Charge = false;
 
+        powerlevel = 0;
+
         _moveAction.Enable();
-        _attackAction.Enable();
+        //_attackAction.Enable();
         _blockAction.Enable();
         _dashAction.Enable();
         _essenceAction.Enable();
         _interactAction.Enable();
         _jumpAction.Enable();
-        _pauseAction.Enabled();
+        //_pauseAction.Enabled();
 
         _jumpAction.performed += OnJump;
         _jumpAction.canceled += OffJump;
-        _attackAction.performed += OnAttack;
+        //_attackAction.performed += OnAttack;
         _essenceAction.performed += OnEssence;
         _blockAction.performed += OnBlock;
         _moveAction.performed += OnMouve;
@@ -133,7 +136,7 @@ public class Player_controle : MonoBehaviour {
     private void OnDisable() {
 
         _moveAction.Disable();
-        _attackAction.Disable();
+        //_attackAction.Disable();
         _blockAction.Disable();
         _dashAction.Disable();
         _essenceAction.Disable();
@@ -142,12 +145,13 @@ public class Player_controle : MonoBehaviour {
 
         _jumpAction.performed -= OnJump;
         _jumpAction.canceled -= OffJump;
-        _attackAction.performed -= OnAttack;
+        //_attackAction.performed -= OnAttack;
         _essenceAction.performed -= OnEssence;
         _blockAction.performed -= OnBlock;
         _moveAction.performed -= OnMouve;
         _dashAction.performed -= OnDash;
         _interactAction.performed -= OnInteract;
+        _pauseAction.performed -= OnPause;
     }
 
 
@@ -178,10 +182,10 @@ public class Player_controle : MonoBehaviour {
             Mouvement_Update_function(); 
         }
 
-        if (Is_Charge) {
+        //if (Is_Charge) {
 
-            Wall_Destroyeur();
-        }
+        //    Wall_Destroyeur();
+        //}
 
         animate_StopRun();
 
@@ -314,7 +318,16 @@ public class Player_controle : MonoBehaviour {
 
     // --- ESSENCE SOURCE --- \\
 
+    private void OnTriggerEnter2D(Collider2D other) {
 
+        if (other.gameObject.CompareTag("Collectible")) {
+
+            powerlevel++;
+
+            other.gameObject.SetActive(false);
+        }
+
+    }
 
 
     // ***************************************************************************************** \\
@@ -341,6 +354,10 @@ public class Player_controle : MonoBehaviour {
 
         if (Is_Essence_Active) {
 
+            if (true) {
+
+            }
+
             Essence_Use(4);
 
         } else if (Is_Grounded || (Is_Wall && Can_WallJump) || (Coyote_Counter > 0 && _rigidbody.velocity.y < 0.05f)) {
@@ -361,20 +378,20 @@ public class Player_controle : MonoBehaviour {
     }
 
     // --- ATTACK --- \\
-    private void OnAttack(InputAction.CallbackContext context) {
+    //private void OnAttack(InputAction.CallbackContext context) {
 
         
 
-        if (Is_Essence_Active) {
+    //    if (Is_Essence_Active) {
 
-            Essence_Use(1);
+    //        Essence_Use(1);
 
-        } else {
+    //    } else {
 
-            Animate_Attaque_On();
-        }
+    //        //Animate_Attaque_On();
+    //    }
 
-    }
+    //}
 
     // --- ESSENCE --- \\
     private void OnEssence(InputAction.CallbackContext context) {
@@ -456,7 +473,7 @@ public class Player_controle : MonoBehaviour {
     // --- DASH --- \\
     private void OnDash(InputAction.CallbackContext context) {
 
-        if (Can_Dash || Is_Essence_Active) {
+        if ((Can_Dash || Is_Essence_Active) && powerlevel >= 1) {
 
             if (Is_Essence_Active) {
 
@@ -568,7 +585,7 @@ public class Player_controle : MonoBehaviour {
             Action_Transform.transform.rotation = Quaternion.Euler(0f, 0f, 0f);
             Wall_Transform.rotation = Quaternion.Euler(0f, 0f, 0f);
 
-            _Animator.SetBool("B_Anim_Run", true);
+            //_Animator.SetBool("B_Anim_Run", true);
 
             _SpriteRenderer.flipX = false;
 
@@ -579,13 +596,13 @@ public class Player_controle : MonoBehaviour {
             Action_Transform.transform.rotation = Quaternion.Euler(0f, 180f, 0f);
             Wall_Transform.rotation = Quaternion.Euler(0f, 180f, 0f);
 
-            _Animator.SetBool("B_Anim_Run", true);
+            //_Animator.SetBool("B_Anim_Run", true);
 
             _SpriteRenderer.flipX = true;
 
         } else {
 
-            _Animator.SetBool("B_Anim_Run", false);
+            //_Animator.SetBool("B_Anim_Run", false);
 
         }
 
@@ -594,32 +611,32 @@ public class Player_controle : MonoBehaviour {
     void animate_StopRun() {
 
         if (_rigidbody.velocity.x == 0) {
-            _Animator.SetBool("B_Anim_Run", false);
+            //_Animator.SetBool("B_Anim_Run", false);
         }
 
     }
 
 
-    void Animate_Attaque_On() {
+    //void Animate_Attaque_On() {
 
-        _Animator.SetBool("B_Anim_Attack", true);
-        Is_Attack_Default = true;
+    //    _Animator.SetBool("B_Anim_Attack", true);
+    //    Is_Attack_Default = true;
 
-    }
+    //}
 
-    void Animate_Attaque_Off() {
+    //void Animate_Attaque_Off() {
 
-        _Animator.SetBool("B_Anim_Attack", false);
-        Is_Attack_Default = false;
-    }
+    //    _Animator.SetBool("B_Anim_Attack", false);
+    //    Is_Attack_Default = false;
+    //}
 
     void Animate_Dash_On() {
-        _Animator.SetBool("B_Anim_Dash", true);
+        //_Animator.SetBool("B_Anim_Dash", true);
     }
 
     void Animate_Dash_Off() {
 
-        _Animator.SetBool("B_Anim_Dash", false);
+        //_Animator.SetBool("B_Anim_Dash", false);
     }
 
     void animate_jump(bool set) {
@@ -749,11 +766,10 @@ public class Player_controle : MonoBehaviour {
                     switch (Essence_Type) {
 
                         case 1:
-                                
-                            StartCoroutine(Routine_Power_Dash());
 
-                        break;
+                        return false;
 
+                        
                         case 2:
                                 
                             StartCoroutine(Routine_Speed_Dash());
@@ -762,9 +778,15 @@ public class Player_controle : MonoBehaviour {
 
                         case 3:
 
-                            this.transform.position = transform.Find("Action").transform.Find("Teleport_dash").GetComponent<Transform>().position;
+                            if (powerlevel >= 3) {
+                                this.transform.position = transform.Find("Action").transform.Find("Teleport_dash").GetComponent<Transform>().position;
 
-                            Essence_light_off();
+                                Essence_light_off();
+
+                            } else {
+
+                                return false;
+                            }
 
                             break;
 
@@ -790,16 +812,33 @@ public class Player_controle : MonoBehaviour {
 
                         case 2:
 
-                            StopCoroutine(Fonction_Walljump());
-                            StartCoroutine(Fonction_Walljump());
+                            
 
-                        break;
+                            if (Can_WallJump == false && powerlevel >=2) {
+
+                                Can_Dash = true;
+                                _rigidbody.velocity = new Vector2(_rigidbody.velocity.x, Stats.Get_PlayerStatistics_Jump_Speed());
+
+                                StopCoroutine(Fonction_Walljump());
+                                StartCoroutine(Fonction_Walljump());
+
+                            } else {
+
+                                return false;
+                            }
+
+                            break;
 
                         case 3:
 
-                            this.transform.position = transform.Find("Teleport_jump").GetComponent<Transform>().position;
+                            if (powerlevel >= 3) {
 
-                            Essence_light_off();
+                                this.transform.position = transform.Find("Teleport_jump").GetComponent<Transform>().position;
+
+                            } else {
+
+                                return false;
+                            }                           
 
                             break;
 
@@ -991,19 +1030,19 @@ public class Player_controle : MonoBehaviour {
     // Charge
     // ***************************************************************************************** \\
 
-    private void Wall_Destroyeur() {
+    //private void Wall_Destroyeur() {
 
-        Collider2D[] UseBox_Overlap = Physics2D.OverlapBoxAll(Player_Usebox_position.position, Player_Usebox_Size, Player_Usebox_LayerMask);
+    //    Collider2D[] UseBox_Overlap = Physics2D.OverlapBoxAll(Player_Usebox_position.position, Player_Usebox_Size, Player_Usebox_LayerMask);
 
-        foreach (var _object in UseBox_Overlap) {
+    //    foreach (var _object in UseBox_Overlap) {
 
-            if (_object.tag == "Destructible") {
+    //        if (_object.tag == "Destructible") {
 
-                _object.GetComponent<Script_Desctructible>().OnDestroy();
-            }
-        }
+    //            _object.GetComponent<Script_Desctructible>().OnDestroy();
+    //        }
+    //    }
 
-    }
+    //}
 
 
     // ***************************************************************************************** \\
