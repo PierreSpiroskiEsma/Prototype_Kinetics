@@ -199,6 +199,8 @@ public class Player_controle : MonoBehaviour {
             _Canvas.GetComponent<Script_Ui>().ClearDisplay();
         }
 
+        this.GetComponent<Script_LightAnnimator>().setLight(Essence_Type_Check());
+
 
     }
 
