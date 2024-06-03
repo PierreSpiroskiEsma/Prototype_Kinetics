@@ -48,7 +48,7 @@ MonoBehaviour:
   m_LightType: 1
   m_BlendStyleIndex: 0
   m_FalloffIntensity: 0.388
-  m_Color: {r: 1, g: 0.13348551, b: 0, a: 1}
+  m_Color: {r: 0.99215686, g: 0.6666667, b: 0.32156864, a: 1}
   m_Intensity: 3.01
   m_LightVolumeIntensity: 1
   m_LightVolumeIntensityEnabled: 0
@@ -67,8 +67,8 @@ MonoBehaviour:
   m_ShadowVolumeIntensityEnabled: 0
   m_ShadowVolumeIntensity: 0.75
   m_LocalBounds:
-    m_Center: {x: 0.07089996, y: 0.013700008, z: 0}
-    m_Extent: {x: 10.7002, y: 10.4547, z: 0}
+    m_Center: {x: 0.07585001, y: 0.008049965, z: 0}
+    m_Extent: {x: 10.696251, y: 10.46375, z: 0}
   m_PointLightInnerAngle: 360
   m_PointLightOuterAngle: 360
   m_PointLightInnerRadius: 0

@@ -194,12 +194,14 @@ public class Player_controle : MonoBehaviour {
         if (Is_Essence_Active)
         {
             _Canvas.GetComponent<Script_Ui>().BarrDisplay(Essence_Inventory);
+            this.GetComponent<Script_LightAnnimator>().setLight(Essence_Type_Check());
         } else
         {
             _Canvas.GetComponent<Script_Ui>().ClearDisplay();
+            this.GetComponent<Script_LightAnnimator>().setLight(0);
         }
 
-        this.GetComponent<Script_LightAnnimator>().setLight(Essence_Type_Check());
+        
 
 
     }
