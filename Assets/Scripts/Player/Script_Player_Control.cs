@@ -25,6 +25,12 @@ public class Player_controle : MonoBehaviour {
     [SerializeField] Vector2 WallJump_Hitbox_Size;
     [SerializeField] LayerMask WallJump_ColisionLayer;
 
+    //Fx
+    [Header("WallJump")]
+    [SerializeField] Transform Tf_Dash_Fx;
+    [SerializeField] Transform Tf_Jump_fx;
+
+
     //Hitbox Overlap
     [Header("Hitbox")]
     [SerializeField] private Transform Player_Hitbox_position;
@@ -50,7 +56,7 @@ public class Player_controle : MonoBehaviour {
     bool Can_WallJump, Can_Dash, Can_Charge;
 
     //State check
-    bool Is_Grounded, Is_Wall , Is_Essence_Active, Is_Attack_Default, Is_Front, Is_Charge, Is_Dash;
+    bool Is_Grounded, Is_Wall , Is_Essence_Active, Is_Attack_Default, Is_Front, Is_Charge, Is_Dash, Power_WasActiv;
     int powerlevel;
 
     //Essence System
@@ -479,6 +485,8 @@ public class Player_controle : MonoBehaviour {
 
         if ((Can_Dash || Is_Essence_Active) && powerlevel >= 1) {
 
+            Animate_Dash_On();
+
             if (Is_Essence_Active) {
 
                 Essence_Use(3);
@@ -635,12 +643,11 @@ public class Player_controle : MonoBehaviour {
     //}
 
     void Animate_Dash_On() {
-        //_Animator.SetBool("B_Anim_Dash", true);
+        _Animator.SetBool("Bool_Dash", true);
     }
 
-    void Animate_Dash_Off() {
-
-        //_Animator.SetBool("B_Anim_Dash", false);
+    public void Animate_Dash_Off() {
+        _Animator.SetBool("Bool_Dash", false);
     }
 
     void animate_jump(bool set) {
@@ -656,6 +663,32 @@ public class Player_controle : MonoBehaviour {
         } else {
             animate_jump(false);
         }
+    }
+
+    public void Dash_fx() {
+
+        if (Power_WasActiv)
+        {
+            Tf_Dash_Fx.gameObject.SetActive(true); 
+        }
+
+    }
+
+    public void Jump_fx()
+    {
+
+        if (Power_WasActiv)
+        {
+            Tf_Jump_fx.gameObject.SetActive(true);
+        }
+
+    }
+
+    public void Fx_Off()
+    {
+        Tf_Dash_Fx.gameObject.SetActive(false);
+        Tf_Jump_fx.gameObject.SetActive(false);
+        Power_WasActiv = false;
     }
 
 
@@ -704,7 +737,7 @@ public class Player_controle : MonoBehaviour {
 
                 Essence_Inventory[i] = New_Essence;
                 Debug.Log("Essence " + New_Essence + " Has been added to the slots " + (i));
-                Essence_Lit();
+                //Essence_Lit();
                 return true;
 
             }
@@ -777,6 +810,7 @@ public class Player_controle : MonoBehaviour {
                         case 2:
                                 
                             StartCoroutine(Routine_Speed_Dash());
+                            Power_WasActiv = true;
 
                         break;
 
@@ -809,6 +843,7 @@ public class Player_controle : MonoBehaviour {
                         case 1:
 
                             _rigidbody.velocity = new Vector2(_rigidbody.velocity.x, Stats.Get_PlayerStatistics_Jump_Speed() * 1.5f);
+                            Power_WasActiv = true;
 
                             Essence_light_off();
 
@@ -886,13 +921,13 @@ public class Player_controle : MonoBehaviour {
 
             Is_Essence_Active = false;
 
-            Essence_Lit();
+            //Essence_Lit();
             return true;
             
         }
 
         Debug.Log("No Essence Avaiable");
-        Essence_Lit();
+        //Essence_Lit();
         return false;
     }
 
@@ -982,7 +1017,8 @@ public class Player_controle : MonoBehaviour {
         yield return new WaitForSeconds(Stats.Get_PlayerStatistics_Dash_Duration());
 
         Is_Dash = false;
-        
+        Animate_Dash_Off();
+
         Speed_Reset();
         Essence_light_off();
 
@@ -1004,6 +1040,7 @@ public class Player_controle : MonoBehaviour {
         yield return new WaitForSeconds(Stats.Get_PlayerStatistics_Dash_Duration());
 
         Is_Dash = false;
+        Animate_Dash_Off();
 
         Speed_Reset();
         Essence_light_off();
@@ -1023,6 +1060,7 @@ public class Player_controle : MonoBehaviour {
         yield return new WaitForSeconds(Stats.Get_PlayerStatistics_Walljump_duration());
 
         Is_Charge = false;
+        Animate_Dash_Off();
         Essence_light_off();
         Debug.Log("Power Dash off");
 
